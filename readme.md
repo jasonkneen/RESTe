@@ -4,7 +4,9 @@
 
 I build a lot of apps that integrate with APIs. These could be written in cloud services like Parse.com etc, but more often they are custom APIs written by another developer. I was using a basic api.js library to handle the API integration, but this involved implementing the api.js file into a separate library file specific to the project.
 
-In this file, I'd list out a load of methods like this:-
+Previously I'd end up writing methods like this:
+
+### OLD WAY
 
 ```JS
 exports.getPreviousLocations = function(callback) {
@@ -20,6 +22,8 @@ exports.getPreviousLocations = function(callback) {
 ```
 
 or a POST one like this:
+
+### OLD WAY
 
 ```JS
 exports.updateUser = function(name, email, password, callback) {
@@ -39,7 +43,9 @@ exports.updateUser = function(name, email, password, callback) {
 };
 ```
 
-The processResponse function was written to try to parse the data as it came back, check for success / results etc - but even with that I was finding myself duplicating a lot of code.
+_(The processResponse function was written to try to parse the data as it came back, check for success / results etc - but even with that I was finding myself duplicating a lot of code.)_
+
+## NEW WAY - USING RESTe
 
 So the idea behind RESTe was to have a single JS library I could drop in a project, then apply a simple config to it and have *it* generate the methods for me.
 
@@ -123,6 +129,14 @@ api.addVideo({
     // do stuff with the video
 });
 ```
+
+## To add
+
+* PUT / DELETE methods
+* Better support for Session Tokens
+* Optional events per method
+
+At this time, I won't be adding model support for Alloy. Happy to look at any PRs though! ;)
 
 ## License
 
