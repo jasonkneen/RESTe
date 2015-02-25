@@ -93,7 +93,7 @@ api.config({
 });
 ```
 
-If you pass an **onError** method, you can intercept any error and present whatever UI you want. Likewise the **onLoad** event will intercept after the http request is done but  **before** the callback. You can do what you want with the result, or pass on to the original callback.
+You can pass the _optional_ **onError** and **onLoad** handlers, which will intercept the error or retrieved data before it's passed to the calling function's callback. This way you can change, test, do-what-you-want-with-it before passing it on.
 
 _(working on adding these as optional to each method too for special cases, say handling tokens)_
 
