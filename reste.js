@@ -70,7 +70,7 @@ function makeHttpRequest(url, method, params, onLoad, onError) {
             onLoad(JSON.parse(http.responseText))
         } else {
             // and if that's not specified, error!
-            throw "No error handler / callback for: " + url;
+            throw "RESTe :: No error handler / callback for: " + url;
         }
     };
 
