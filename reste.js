@@ -113,14 +113,6 @@ exports.addMethod = function(args) {
             }
         }
 
-        if (args.expects){
-            args.expects.forEach(function(expectedParam){
-                if (!params[expectedParam]) {
-                    throw "RESTe :: missing parameter " + expectedParam + " for method " + args.name
-                }
-            })
-        }
-
         if (args.post) method = "POST";
         if (args.get) method = "GET";
         if (args.put) method = "PUT";
@@ -138,11 +130,39 @@ exports.addMethod = function(args) {
 
         if (args.onError) {
             // change the callback to be the one specified
-            onError = function(e) {                
+            onError = function(e) {
                 args.onError(e, onLoad);
             }
         }
 
-        makeHttpRequest(url, method, body, onLoad, onError);
+        if (args.expects) {
+            // look for explicityly required parameters
+            args.expects.forEach(function(expectedParam) {
+                if (!params[expectedParam]) {
+                    throw "RESTe :: missing parameter " + expectedParam + " for method " + args.name
+                }
+            });
+
+            makeHttpRequest(url, method, body, onLoad, onError);
+
+        } else {
+            //work out which parameters are required
+            var m, missing = [],
+                re = /(\<\w*\>)/g;
+
+            while ((m = re.exec(url)) != null) {
+                if (m.index === re.lastIndex) {
+                    re.lastIndex++;
+                }
+
+                missing.push(m[0]);
+            }
+
+            if (missing.length > 0) {
+                throw "RESTe :: missing parameter/s " + missing + " for method " + args.name
+            } else {                
+                makeHttpRequest(url, method, body, onLoad, onError);
+            }
+        }
     };
 };
