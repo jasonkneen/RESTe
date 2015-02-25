@@ -103,6 +103,8 @@ You can also pass the onLoad and onError handlers within each method - to have a
 
 You can also pass an **expects* property for calls that require parameters, and include an array of parameters that you expect to be provided. If you  do, RESTe will validate and display and exception if one is missing.
 
+(I'd like to make this automatic in a next version so that it automatically finds any declrations like <videoId> and then throws an error if you don't include them)
+
 Once you've done all this (and assuming no errors), you'll have new methods available:
 
 ```javascript
