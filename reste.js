@@ -107,6 +107,11 @@ exports.addMethod = function(args) {
             }
         }
 
-        makeHttpRequest(url, args.post ? "POST" : "GET", body, callback);
+        if (args.post) method = "POST";
+        if (args.get) method = "GET";
+        if (args.put) method = "PUT";
+        if (args.delete) method = "DELETE";
+
+        makeHttpRequest(url, method, body, callback);
     };
 };
