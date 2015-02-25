@@ -130,9 +130,9 @@ api.addVideo({
 
 ## To add
 
-* PUT / DELETE methods
-* Better support for Session Tokens
-* Optional events per method
+* auto-config from remote API
+* better support for Session Tokens
+* optional events per method
 
 At this time, I won't be adding model support for Alloy. Happy to look at any PRs though! ;)
 
