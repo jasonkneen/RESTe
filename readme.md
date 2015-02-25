@@ -73,7 +73,10 @@ api.config({
     },
     methods: [{
         name: "courses",
-        post: "functions/getCourses"
+        post: "functions/getCourses",
+        onError: function(e, callback){
+        	alert("There was an error getting the courses!");
+        }
     }, {
         name: "getVideos",
         get: "classes/videos"
@@ -95,7 +98,7 @@ api.config({
 
 You can pass the _optional_ **onError** and **onLoad** handlers, which will intercept the error or retrieved data before it's passed to the calling function's callback. This way you can change, test, do-what-you-want-with-it before passing it on.
 
-_(working on adding these as optional to each method too for special cases, say handling tokens)_
+You can also pass the onLoad and onError handlers within each method - to have a unique response from each. In all cases you always get two params which are the **response** and the **original callback** so you can pass it through, or stop the call.
 
 Once you've done all this (and assuming no errors), you'll have new methods available:
 
@@ -132,7 +135,6 @@ api.addVideo({
 
 * auto-config from remote API
 * better support for Session Tokens
-* optional events per method
 
 At this time, I won't be adding model support for Alloy. Happy to look at any PRs though! ;)
 

@@ -26,7 +26,7 @@ exports.config = function(args) {
 
 // makes an http request to a URL, as a POST / GET / currently, 
 // passing params and callback
-function makeHttpRequest(url, method, params, callback) {
+function makeHttpRequest(url, method, params, onLoad, onError) {
 
     // debug the url
     log("::RESTE:: " + (config.baseUrl ? config.baseUrl + url : url));
@@ -49,9 +49,9 @@ function makeHttpRequest(url, method, params, callback) {
     http.onload = function(e) {
 
         if (config.onLoad) {
-            config.onLoad(JSON.parse(http.responseText), callback);
+            config.onLoad(JSON.parse(http.responseText), onLoad);
         } else {
-            callback(JSON.parse(http.responseText));
+            onLoad(JSON.parse(http.responseText));
         }
 
     };
@@ -59,11 +59,17 @@ function makeHttpRequest(url, method, params, callback) {
     http.onerror = function(e) {
         e.url = url;
 
-        if (config.onError) {
+        if (onError) {
+            // if we have an onError method, use it
+            onError(JSON.parse(http.responseText))
+        } else if (config.onError) {
+            // otherwise fallback to the one specified in config
             config.onError(JSON.parse(http.responseText))
-        } else if (callback) {
-            callback(JSON.parse(http.responseText))
+        } else if (onLoad) {
+            // otherwise revert to the onLoad callback
+            onLoad(JSON.parse(http.responseText))
         } else {
+            // and if that's not specified, error!
             throw "No error handler / callback for: " + url;
         }
     };
@@ -89,12 +95,13 @@ exports.setRequestHeaders = function(headers) {
 
 // add a new method
 exports.addMethod = function(args) {
-    exports[args.name] = function(params, callback) {
+    exports[args.name] = function(params, onLoad) {
 
-        var body, url = args.post || args.get;
+        var body, url = args.post || args.get,
+            onError;
 
-        if (!callback && typeof(params) == "function") {
-            callback = params;
+        if (!onLoad && typeof(params) == "function") {
+            onLoad = params;
         } else {
             for (param in params) {
 
@@ -103,7 +110,6 @@ exports.addMethod = function(args) {
                 } else {
                     url = url.replace("<" + param + ">", params[param]);
                 }
-
             }
         }
 
@@ -112,6 +118,23 @@ exports.addMethod = function(args) {
         if (args.put) method = "PUT";
         if (args.delete) method = "DELETE";
 
-        makeHttpRequest(url, method, body, callback);
+        if (args.onLoad) {
+            // save the original callback
+            var originalOnLoad = onLoad;
+
+            // change the callback to be the one specified
+            onLoad = function(e) {
+                args.onLoad(e, originalOnLoad);
+            }
+        }
+
+        if (args.onError) {
+            // change the callback to be the one specified
+            onError = function(e) {                
+                args.onError(e, onLoad);
+            }
+        }
+
+        makeHttpRequest(url, method, body, onLoad, onError);
     };
 };
