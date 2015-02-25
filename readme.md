@@ -82,7 +82,8 @@ api.config({
         get: "classes/videos"
     }, {
         name: "getVideoById",
-        get: "classes/videos/<videoId>"
+        get: "classes/videos/<videoId>",
+        expects: ["videoId"]
     }, {
         name: "addVideo",
         post: "classes/videos"
@@ -99,6 +100,8 @@ api.config({
 You can pass the _optional_ **onError** and **onLoad** handlers, which will intercept the error or retrieved data before it's passed to the calling function's callback. This way you can change, test, do-what-you-want-with-it before passing it on.
 
 You can also pass the onLoad and onError handlers within each method - to have a unique response from each. In all cases you always get two params which are the **response** and the **original callback** so you can pass it through, or stop the call.
+
+You can also pass an **expects* property for calls that require parameters, and include an array of parameters that you expect to be provided. If you  do, RESTe will validate and display and exception if one is missing.
 
 Once you've done all this (and assuming no errors), you'll have new methods available:
 
