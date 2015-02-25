@@ -113,6 +113,14 @@ exports.addMethod = function(args) {
             }
         }
 
+        if (args.expects){
+            args.expects.forEach(function(expectedParam){
+                if (!params[expectedParam]) {
+                    throw "RESTe :: missing parameter " + expectedParam + " for method " + args.name
+                }
+            })
+        }
+
         if (args.post) method = "POST";
         if (args.get) method = "GET";
         if (args.put) method = "PUT";
