@@ -82,8 +82,7 @@ api.config({
         get: "classes/videos"
     }, {
         name: "getVideoById",
-        get: "classes/videos/<videoId>",
-        expects: ["videoId"]
+        get: "classes/videos/<videoId>"
     }, {
         name: "addVideo",
         post: "classes/videos"
@@ -101,9 +100,7 @@ You can pass the _optional_ **onError** and **onLoad** handlers, which will inte
 
 You can also pass the onLoad and onError handlers within each method - to have a unique response from each. In all cases you always get two params which are the **response** and the **original callback** so you can pass it through, or stop the call.
 
-You can also pass an **expects* property for calls that require parameters, and include an array of parameters that you expect to be provided. If you  do, RESTe will validate and display and exception if one is missing.
-
-(I'd like to make this automatic in a next version so that it automatically finds any declrations like <videoId> and then throws an error if you don't include them)
+If you specify parameters required e.g. **videoId** then RESTe will automatically check for these in the parameters passed to the method, and raise an error if they're missing.
 
 Once you've done all this (and assuming no errors), you'll have new methods available:
 
