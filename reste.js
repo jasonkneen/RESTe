@@ -28,6 +28,15 @@ exports.config = function(args) {
 // passing params and callback
 function makeHttpRequest(url, method, params, onLoad, onError) {
 
+    function isJSON(str) {
+        try {
+            JSON.parse(str);
+        } catch (e) {
+            return false;
+        }
+        return true;
+    }
+
     // debug the url
     log("::RESTE:: " + (config.baseUrl ? config.baseUrl + url : url));
 
@@ -61,8 +70,12 @@ function makeHttpRequest(url, method, params, onLoad, onError) {
             // if we have an onError method, use it
             onError(JSON.parse(http.responseText))
         } else if (config.onError) {
-            // otherwise fallback to the one specified in config
-            config.onError(JSON.parse(http.responseText))
+            // otherwise fallback to the one specified in config            
+            if (isJSON(http.responseText)) {
+                config.onError(JSON.parse(http.responseText))
+            } else {
+                config.onError(http.responseText)
+            }
         } else if (onLoad) {
             // otherwise revert to the onLoad callback
             onLoad(JSON.parse(http.responseText))
