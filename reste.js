@@ -37,6 +37,14 @@ function makeHttpRequest(url, method, params, onLoad, onError) {
         return true;
     }
 
+    function parseJSON(text) {
+        if (isJSON(text)) {
+            return JSON.parse(text)
+        } else {
+            return text;
+        }
+    }
+
     // debug the url
     log("::RESTE:: " + (config.baseUrl ? config.baseUrl + url : url));
 
@@ -57,9 +65,9 @@ function makeHttpRequest(url, method, params, onLoad, onError) {
     // events
     http.onload = function(e) {
         if (config.onLoad) {
-            config.onLoad(JSON.parse(http.responseText), onLoad);
+            config.onLoad(parseJSON(http.responseText), onLoad);
         } else {
-            onLoad(JSON.parse(http.responseText));
+            onLoad(parseJSON(http.responseText));
         }
     };
 
@@ -67,18 +75,14 @@ function makeHttpRequest(url, method, params, onLoad, onError) {
         e.url = url;
 
         if (onError) {
-            // if we have an onError method, use it
-            onError(JSON.parse(http.responseText))
+            // if we have an onError method, use it            
+            onError(parseJSON(http.responseText))
         } else if (config.onError) {
-            // otherwise fallback to the one specified in config            
-            if (isJSON(http.responseText)) {
-                config.onError(JSON.parse(http.responseText))
-            } else {
-                config.onError(http.responseText)
-            }
+            // otherwise fallback to the one specified in config                        
+            config.onError(parseJSON(http.responseText))
         } else if (onLoad) {
             // otherwise revert to the onLoad callback
-            onLoad(JSON.parse(http.responseText))
+            onLoad(parseJSON(http.responseText))
         } else {
             // and if that's not specified, error!
             throw "RESTe :: No error handler / callback for: " + url;
