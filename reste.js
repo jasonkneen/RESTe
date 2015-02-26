@@ -47,13 +47,11 @@ function makeHttpRequest(url, method, params, onLoad, onError) {
 
     // events
     http.onload = function(e) {
-
         if (config.onLoad) {
             config.onLoad(JSON.parse(http.responseText), onLoad);
         } else {
             onLoad(JSON.parse(http.responseText));
         }
-
     };
 
     http.onerror = function(e) {
@@ -97,14 +95,14 @@ exports.setRequestHeaders = function(headers) {
 exports.addMethod = function(args) {
     exports[args.name] = function(params, onLoad) {
 
-        var body, url = args.post || args.get,
+        var body,
+            url = args.post || args.get,
             onError;
 
         if (!onLoad && typeof(params) == "function") {
             onLoad = params;
         } else {
             for (param in params) {
-
                 if (param === "body") {
                     body = params[param];
                 } else {
@@ -160,7 +158,7 @@ exports.addMethod = function(args) {
 
             if (missing.length > 0) {
                 throw "RESTe :: missing parameter/s " + missing + " for method " + args.name
-            } else {                
+            } else {
                 makeHttpRequest(url, method, body, onLoad, onError);
             }
         }
