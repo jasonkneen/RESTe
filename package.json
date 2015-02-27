@@ -1,0 +1,34 @@
+{
+  "name": "reste",
+  "version": "1.0.0",
+  "description": "A simple JavaScript REST / API helper for Titanium",
+  "titaniumManifest": {
+    "guid": "afafe8b0-b93b-771c-a9e5-4e71db81b9ff"
+  },
+  "main": "reste.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jasonkneen/RESTe.git"
+  },
+  "keywords": [
+    "rest",
+    "api",
+    "titanium",
+    "alloy"
+  ],
+  "author": "Jason Kneen",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/jasonkneen/RESTe/issues"
+  },
+  "homepage": "https://github.com/jasonkneen/RESTe",
+  "dependencies": {  
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-titaniumifier": "^1.1.0"
+  }
+}
