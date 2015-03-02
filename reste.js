@@ -50,7 +50,7 @@ function makeHttpRequest(url, method, params, onLoad, onError) {
 
         if (config.onLoad) {
             config.onLoad(JSON.parse(http.responseText), onLoad);
-        } else {
+        } else if (onLoad) {
             onLoad(JSON.parse(http.responseText));
         }
 
