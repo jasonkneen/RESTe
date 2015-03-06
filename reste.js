@@ -94,7 +94,7 @@ function makeHttpRequest(url, method, params, onLoad, onError) {
 
     function send() {
         // go
-        if (params && method == "POST") {
+        if (params && (method === "POST" || method === "PUT")) {
             http.send(JSON.stringify(params));
         } else {
             http.send();
