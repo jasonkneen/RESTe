@@ -92,7 +92,7 @@ function makeHttpRequest(url, method, params, onLoad, onError) {
     };
 
     // go
-    if (params && method == "POST") {
+    if (params && (method === "POST" || method === "PUT")) {
         http.send(JSON.stringify(params));
     } else {
         http.send();
@@ -115,8 +115,16 @@ exports.addMethod = function(args) {
     exports[args.name] = function(params, onLoad) {
 
         var body,
-            url = args.post || args.get,
+            method = "GET",
+            url,
             onError;
+
+        if (args.post) method = "POST";
+        if (args.get) method = "GET";
+        if (args.put) method = "PUT";
+        if (args.delete) method = "DELETE";
+
+        url = args[method.toLowerCase()] || args.get;
 
         if (!onLoad && typeof(params) == "function") {
             onLoad = params;
@@ -129,11 +137,6 @@ exports.addMethod = function(args) {
                 }
             }
         }
-
-        if (args.post) method = "POST";
-        if (args.get) method = "GET";
-        if (args.put) method = "PUT";
-        if (args.delete) method = "DELETE";
 
         if (args.onLoad) {
             // save the original callback
