@@ -48,6 +48,8 @@ function makeHttpRequest(url, method, params, onLoad, onError) {
     // debug the url
     log("::RESTE:: " + (config.baseUrl ? config.baseUrl + url : url));
 
+    log("::RESTE:: " + params);
+
     // create a client
     var http = Ti.Network.createHTTPClient();
 
