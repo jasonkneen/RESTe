@@ -69,7 +69,7 @@ function makeHttpRequest(url, method, params, onLoad, onError) {
     http.onload = function(e) {
         if (config.onLoad) {
             config.onLoad(parseJSON(http.responseText), onLoad);
-        } else {
+        } else if (onLoad) {
             onLoad(parseJSON(http.responseText));
         }
     };
