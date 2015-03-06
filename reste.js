@@ -152,8 +152,8 @@ exports.addMethod = function(args) {
 
         if (args.expects) {
             // look for explicityly required parameters
-            args.expects.forEach(function(expectedParam) {
-                if (!params[expectedParam]) {
+            args.expects.forEach(function(expectedParam) {                
+                if ((method == "POST" && params.body) ? !params.body[expectedParam] : !params[expectedParam]) {
                     throw "RESTe :: missing parameter " + expectedParam + " for method " + args.name
                 }
             });
