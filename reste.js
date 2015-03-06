@@ -16,6 +16,7 @@ exports.config = function(args) {
     config.timeout = args.timeout;
     config.onError = args.onError;
     config.onLoad = args.onLoad;
+    config.beforePost = args.beforePost;
 
     exports.setRequestHeaders(args.requestHeaders);
 
@@ -91,12 +92,25 @@ function makeHttpRequest(url, method, params, onLoad, onError) {
         }
     };
 
-    // go
-    if (params && method == "POST") {
-        http.send(JSON.stringify(params));
-    } else {
-        http.send();
+    function send() {
+        // go
+        if (params && method == "POST") {
+            http.send(JSON.stringify(params));
+        } else {
+            http.send();
+        }
     }
+
+    if (method == "POST" && params && config.beforePost) {
+        config.beforePost(params, function(e) {
+            params = e;
+        });
+
+        send();
+    } else {
+        send();
+    }
+
 }
 
 // set Requestheaders
@@ -154,7 +168,7 @@ exports.addMethod = function(args) {
 
         if (args.expects) {
             // look for explicityly required parameters
-            args.expects.forEach(function(expectedParam) {                
+            args.expects.forEach(function(expectedParam) {
                 if ((method == "POST" && params.body) ? !params.body[expectedParam] : !params[expectedParam]) {
                     throw "RESTe :: missing parameter " + expectedParam + " for method " + args.name
                 }
