@@ -58,14 +58,15 @@ function makeHttpRequest(args, onLoad, onError) {
 
     // load up any global request headers
     requestHeaders.forEach(function(header) {
-        http.setRequestHeader(header.name, header.value);
+        http.setRequestHeader(header.name, typeof header.value == "function" ? header.value : header.value);
     });
 
     // non-global headers
     if (args.headers) {
         // load up any request headers
         for (header in args.headers) {
-            http.setRequestHeader(header, args.headers[header]);
+
+            http.setRequestHeader(header, typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]);
         }
     }
 
