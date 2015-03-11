@@ -23,7 +23,7 @@ exports.config = function(args) {
 
 // makes an http request to a URL, as a POST / GET / currently, 
 // passing params and callback
-function makeHttpRequest(url, method, params, onLoad, onError) {
+function makeHttpRequest(args, onLoad, onError) {
 
     function isJSON(str) {
         try {
@@ -43,9 +43,9 @@ function makeHttpRequest(url, method, params, onLoad, onError) {
     }
 
     // debug the url
-    log("::RESTE:: " + (config.baseUrl ? config.baseUrl + url : url));
+    log("::RESTE:: " + (config.url ? config.url + args.url : args.url));
 
-    log("::RESTE:: " + JSON.stringify(params));
+    log("::RESTE:: " + JSON.stringify(args.params));
 
     // create a client
     var http = Ti.Network.createHTTPClient();
@@ -54,12 +54,20 @@ function makeHttpRequest(url, method, params, onLoad, onError) {
     http.setTimeout(config.timeout || 10000);
 
     // open the url
-    http.open(method, (config.baseUrl ? config.baseUrl + url : url));
+    http.open(args.method, (config.url ? config.url + args.url : args.url));
 
-    // load up any request headers
+    // load up any global request headers
     requestHeaders.forEach(function(header) {
         http.setRequestHeader(header.name, header.value);
     });
+
+    // non-global headers
+    if (args.headers) {
+        // load up any request headers
+        for (header in args.headers) {
+            http.setRequestHeader(header, args.headers[header]);
+        }
+    }
 
     // events
     http.onload = function(e) {
@@ -71,7 +79,7 @@ function makeHttpRequest(url, method, params, onLoad, onError) {
     };
 
     http.onerror = function(e) {
-        e.url = url;
+        e.url = args.url;
 
         if (onError) {
             // if we have an onError method, use it            
@@ -84,22 +92,22 @@ function makeHttpRequest(url, method, params, onLoad, onError) {
             onLoad(parseJSON(http.responseText))
         } else {
             // and if that's not specified, error!
-            throw "RESTe :: No error handler / callback for: " + url;
+            throw "RESTe :: No error handler / callback for: " + args.url;
         }
     };
 
     function send() {
         // go
-        if (params && (method === "POST" || method === "PUT")) {
-            http.send(JSON.stringify(params));
+        if (args.params && (args.method === "POST" || args.method === "PUT")) {
+            http.send(JSON.stringify(args.params));
         } else {
             http.send();
         }
     }
 
-    if (method == "POST" && params && config.beforePost) {
-        config.beforePost(params, function(e) {
-            params = e;
+    if (args.method == "POST" && args.params && config.beforePost) {
+        config.beforePost(args.params, function(e) {
+            args.params = e;
         });
 
         send();
@@ -122,6 +130,7 @@ exports.setRequestHeaders = function(headers) {
 
 // add a new method
 exports.addMethod = function(args) {
+    console.log(args.requestHeaders)
     exports[args.name] = function(params, onLoad) {
 
         var body,
@@ -173,7 +182,12 @@ exports.addMethod = function(args) {
                 }
             });
 
-            makeHttpRequest(url, method, body, onLoad, onError);
+            makeHttpRequest({
+                url: url,
+                method: method,
+                params: body,
+                headers: args.requestHeaders || args.headers
+            }, onLoad, onError);
 
         } else {
             //work out which parameters are required
@@ -191,7 +205,12 @@ exports.addMethod = function(args) {
             if (missing.length > 0) {
                 throw "RESTe :: missing parameter/s " + missing + " for method " + args.name
             } else {
-                makeHttpRequest(url, method, body, onLoad, onError);
+                makeHttpRequest({
+                    url: url,
+                    method: method,
+                    params: body,
+                    headers: args.requestHeaders || args.headers
+                }, onLoad, onError);
             }
         }
     };
