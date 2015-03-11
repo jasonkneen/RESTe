@@ -12,15 +12,11 @@ function log(message) {
 // sets up the config, headers, adds methods
 exports.config = function(args) {
 
-    config.baseUrl = args.url;
-    config.timeout = args.timeout;
-    config.onError = args.onError;
-    config.onLoad = args.onLoad;
-    config.beforePost = args.beforePost;
+    config = args;
 
-    exports.setRequestHeaders(args.requestHeaders);
+    exports.setRequestHeaders(config.requestHeaders);
 
-    args.methods.forEach(function(method) {
+    config.methods.forEach(function(method) {
         exports.addMethod(method);
     });
 };
