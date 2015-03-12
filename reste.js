@@ -25,8 +25,6 @@ exports.config = function(args) {
 // passing params and callback
 function makeHttpRequest(args, onLoad, onError) {
 
-    alert(JSON.stringify(args.params))
-
     function isJSON(str) {
         try {
             JSON.parse(str);
@@ -48,8 +46,6 @@ function makeHttpRequest(args, onLoad, onError) {
     log("::RESTE:: " + (config.url ? config.url + args.url : args.url));
 
     log("::RESTE:: " + JSON.stringify(args.params));
-
-    log("::RESTE:: " + args.params);
 
     // create a client
     var http = Ti.Network.createHTTPClient();
