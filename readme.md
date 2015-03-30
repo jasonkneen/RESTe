@@ -64,6 +64,7 @@ Wherever you want to initialise the API interface, put this:-
 var api = require("reste");
 
 api.config({
+    debug: true, // allows logging to console of ::REST:: messages
     timeout: 4000,
     url: "https://api.parse.com/1/",
     requestHeaders: {

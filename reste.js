@@ -4,7 +4,7 @@ var config = {},
 
 // generic log handler in DEV mode
 function log(message) {
-    if (ENV_DEV) {
+    if (config.debug) {
         console.log(message);
     }
 }
