@@ -123,13 +123,19 @@ function makeHttpRequest(args, onLoad, onError) {
         }
     }
 
-    if (args.method == "POST" && args.params && config.beforePost) {
+    if (args.method == "POST" && config.beforePost) {
+
+        // initialise empty params in case it's undefined
+        args.params = args.params || {};
+
         config.beforePost(args.params, function(e) {
+
             args.params = e;
         });
 
         send();
     } else {
+
         send();
     }
 
