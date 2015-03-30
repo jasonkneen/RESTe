@@ -153,7 +153,9 @@ exports.addMethod = function(args) {
                 if (param === "body") {
                     body = params[param];
                 } else {
-                    url = url.replace("<" + param + ">", params[param]);
+                    while (url.indexOf("<" + param + ">") >= 0) {
+                        url = url.replace("<" + param + ">", params[param]);
+                    }
                 }
             }
         }
