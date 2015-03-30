@@ -52,6 +52,8 @@ function makeHttpRequest(args, onLoad, onError) {
     // create a client
     var http = Ti.Network.createHTTPClient();
 
+    var formEncode = false;
+
     //set some defaults
     http.setTimeout(config.timeout || 10000);
 
@@ -60,6 +62,10 @@ function makeHttpRequest(args, onLoad, onError) {
 
     // load up any global request headers
     requestHeaders.forEach(function(header) {
+        if (header.name == "Content-Type" && header.value == "application/x-www-form-urlencoded") {
+            formEncode = true;
+        }
+
         http.setRequestHeader(header.name, typeof header.value == "function" ? header.value : header.value);
     });
 
@@ -67,6 +73,10 @@ function makeHttpRequest(args, onLoad, onError) {
     if (args.headers) {
         // load up any request headers
         for (header in args.headers) {
+
+            if (header == "Content-Type" && args.headers[header] == "application/x-www-form-urlencoded") {
+                formEncode = true;
+            }
 
             http.setRequestHeader(header, typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]);
         }
@@ -102,7 +112,12 @@ function makeHttpRequest(args, onLoad, onError) {
     function send() {
         // go
         if (args.params && (args.method === "POST" || args.method === "PUT")) {
-            http.send(args.params);
+            if (formEncode) {
+                http.send(args.params);
+            } else {
+                http.send(JSON.stringify(args.params));
+            }
+
         } else {
             http.send();
         }
