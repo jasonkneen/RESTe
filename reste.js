@@ -21,9 +21,15 @@ exports.config = function(args) {
         exports.addMethod(method);
     });
 
-    config.models.forEach(function(model) {
-        exports.addModel(model);
-    });
+    if (config.models) {
+
+        initModels();
+
+        config.models.forEach(function(model) {
+            exports.addModel(model);
+        });
+    }
+
 };
 
 // makes an http request to a URL, as a POST / GET / currently, 
@@ -253,94 +259,98 @@ exports.addMethod = function(args) {
 };
 
 // Hacktastic section where we override the Alloy.createModel method
-Alloy._createModel = Alloy.createModel;
+// only call and run this section if we need it; if models are defined
 
-Alloy.createModel = function(name, attributes) {
-    try {
-        return Alloy._createModel(name, attributes);
-    } catch (err) {
-        return exports.createModel(name, attributes);
+function initModels() {
+    Alloy._createModel = Alloy.createModel;
+
+    Alloy.createModel = function(name, attributes) {
+        try {
+            return Alloy._createModel(name, attributes);
+        } catch (err) {
+            return exports.createModel(name, attributes);
+        }
     }
-}
 
-exports.createModel = function(name, attributes) {
-    var model = new Backbone.Model(attributes);
+    exports.createModel = function(name, attributes) {
+        var model = new Backbone.Model(attributes);
 
-    model._type = name;
+        model._type = name;
 
-    return model;
-};
+        return model;
+    };
 
-// add a new model definition
-exports.addModel = function(args) {
-    exports.modelConfig = exports.modelConfig || {};
+    // add a new model definition
+    exports.addModel = function(args) {
+        exports.modelConfig = exports.modelConfig || {};
 
-    // storing a reference to the model definition in config
-    exports.modelConfig[args.name] = args;
+        // storing a reference to the model definition in config
+        exports.modelConfig[args.name] = args;
 
-    if (args.collection && args.collection.name) {
-        Alloy.Collections[args.collection.name] = Alloy.Collections[args.collection.name] || new Backbone.Collection();
-        //Alloy.Collections[args.collection.name]._method = args.name;
-        Alloy.Collections[args.collection.name]._type = args.name;
+        if (args.collection && args.collection.name) {
+            Alloy.Collections[args.collection.name] = Alloy.Collections[args.collection.name] || new Backbone.Collection();
+            //Alloy.Collections[args.collection.name]._method = args.name;
+            Alloy.Collections[args.collection.name]._type = args.name;
 
-        Alloy.Collections[args.collection.name].model = Backbone.Model.extend({
-            _type: args.name,
-            _method: args.name
-        });
+            Alloy.Collections[args.collection.name].model = Backbone.Model.extend({
+                _type: args.name,
+                _method: args.name
+            });
+        }
     }
-}
 
-// Intercept sync to handle collections / models
-Backbone.sync = function(method, model, options) {
-    console.log(method + model._type)
+    // Intercept sync to handle collections / models
+    Backbone.sync = function(method, model, options) {
+        console.log(method + model._type)
 
-    modelConfig = exports.modelConfig[model._type];
+        modelConfig = exports.modelConfig[model._type];
 
-    // if this is a collection, get the data and complete
-    if (model instanceof Backbone.Collection) {
+        // if this is a collection, get the data and complete
+        if (model instanceof Backbone.Collection) {
 
-        exports[modelConfig.read](function(response) {
+            exports[modelConfig.read](function(response) {
 
-            if (options.success) {
-                response[modelConfig.collection.content].forEach(function(item) {
-                    item.id = item[modelConfig.id];
+                if (options.success) {
+                    response[modelConfig.collection.content].forEach(function(item) {
+                        item.id = item[modelConfig.id];
+                    });
+
+                    options.success(response.results);
+                }
+            });
+
+        } else if (model instanceof Backbone.Model) {
+
+            if (method == "update") {
+                var body = {};
+
+                // update!
+                body[modelConfig.id] = model.id;
+                body.body = model;
+
+                exports[modelConfig.update](body, function(e) {
+                    options.success(e);
                 });
-
-                options.success(response.results);
             }
-        });
 
-    } else if (model instanceof Backbone.Model) {
+            if (method == "create") {
+                exports[modelConfig.create]({
+                    body: model
+                }, function(e) {
+                    e.id = e[modelConfig.id];
+                    options.success(e);
+                });
+            }
 
-        if (method == "update") {
-            var body = {};
+            if (method == "delete") {
+                var body = {};
 
-            // update!
-            body[modelConfig.id] = model.id;
-            body.body = model;
-
-            exports[modelConfig.update](body, function(e) {
-                options.success(e);
-            });
-        }
-
-        if (method == "create") {
-            exports[modelConfig.create]({
-                body: model
-            }, function(e) {
-                e.id = e[modelConfig.id];
-                options.success(e);
-            });
-        }
-
-        if (method == "delete") {
-            var body = {};
-
-            body[modelConfig.id] = model.id;
-            body.body = model;
-            exports[modelConfig.delete](body, function(e) {
-                options.success(e);
-            });
+                body[modelConfig.id] = model.id;
+                body.body = model;
+                exports[modelConfig.delete](body, function(e) {
+                    options.success(e);
+                });
+            }
         }
     }
 }
