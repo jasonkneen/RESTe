@@ -138,6 +138,8 @@ api.addVideo({
 
 As of 1.0.5, RESTe now supports collection and model generation. So far I've got collections working and defintiions of models so you can iterate them, bind to controls etc. The framework is there to do the CRUD calls - that's next on my list.
 
+### Defining methods with models / collections
+
 ```javascript
 methods: [{
         name: "getLocations",
@@ -159,6 +161,25 @@ methods: [{
             callback(e);
         }
     }]
+```
+
+### Using models / collections
+
+In the example above, I can refresh the data for a collection by using:
+
+```javascript 
+Alloy.Collections.locations.fetch();
+```
+
+and bind it to a tableview as follows:
+
+```xml
+<TableView dataCollection="locations" onClick="selectLocation">
+                <TableViewRow id="locationRow" model="{objectId}" >
+                    <Label class="title" top="10"left="20" text="{name}"/>
+                    <Label class="subTitle" bottom="10" left="20" text="{address}"/>
+                </TableViewRow>
+ </TableView>
 ```
 
 ## To add
