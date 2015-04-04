@@ -1,5 +1,7 @@
 # RESTe
 
+LATEST: Updated with support for collections and models in Alloy - currently reading collections is possible, full CRUD is support is coming ;)
+
 ## Why?
 
 I build a lot of apps that integrate with APIs. These could be written in cloud services like Parse.com etc, but more often they are custom APIs written by another developer. I was using a basic api.js library to handle the API integration, but this involved implementing the api.js file into a separate library file specific to the project.
