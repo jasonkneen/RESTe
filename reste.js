@@ -1,6 +1,6 @@
 // setup vars
 var config = {},
-    requestHeaders = [];
+    requestHeaders = []
 
 // generic log handler in DEV mode
 function log(message) {
@@ -8,6 +8,39 @@ function log(message) {
         console.log(message);
     }
 }
+
+// Intercept sync to handle collections / models
+
+Backbone.sync = function(method, model, options) {
+
+    // if this is a collection, get the data and complete
+    if (model instanceof Backbone.Collection) {
+
+        exports[model._method](function(e) {
+
+            if (options.success) {
+
+                var modelDef = exports[model._method].model
+
+                e[modelDef.collection.content].forEach(function(model) {
+
+                    model.id = model.id || model[modelDef.id];
+                });
+
+                options.success(e.results);
+            }
+        });
+
+    } else if (model instanceof Backbone.Model) {
+
+        // TODO do CRUD stuff here
+
+        console.log(method);
+        console.log(options);
+        console.log(model._type);
+    }
+}
+
 
 // sets up the config, headers, adds methods
 exports.config = function(args) {
@@ -84,10 +117,14 @@ function makeHttpRequest(args, onLoad, onError) {
 
     // events
     http.onload = function(e) {
+
+        // get the response parsed
+        var response = parseJSON(http.responseText);       
+
         if (config.onLoad) {
-            config.onLoad(parseJSON(http.responseText), onLoad);
+            config.onLoad(response, onLoad);
         } else if (onLoad) {
-            onLoad(parseJSON(http.responseText));
+            onLoad(response);
         }
     };
 
@@ -155,6 +192,9 @@ exports.setRequestHeaders = function(headers) {
 // add a new method
 exports.addMethod = function(args) {
     console.log(args.requestHeaders)
+
+
+
     exports[args.name] = function(params, onLoad) {
 
         var body,
@@ -212,7 +252,7 @@ exports.addMethod = function(args) {
                 url: url,
                 method: method,
                 params: body,
-                headers: args.requestHeaders || args.headers
+                headers: args.requestHeaders || args.headers,
             }, onLoad, onError);
 
         } else {
@@ -235,9 +275,24 @@ exports.addMethod = function(args) {
                     url: url,
                     method: method,
                     params: body,
-                    headers: args.requestHeaders || args.headers
+                    headers: args.requestHeaders || args.headers,
                 }, onLoad, onError);
             }
         }
     };
+
+    // add support for backbone collections
+    if (args.model && args.model.collection && args.model.collection.name) {
+
+        Alloy.Collections[args.model.collection.name] = new Backbone.Collection();
+        Alloy.Collections[args.model.collection.name]._method = args.name;
+
+        exports[args.name].model = args.model;
+
+        if (args.model && args.model.name) {
+            Alloy.Collections[args.model.collection.name].model = Backbone.Model.extend({
+                _type: args.model.name
+            });
+        }
+    }
 };

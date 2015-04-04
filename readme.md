@@ -134,12 +134,37 @@ api.addVideo({
 });
 ```
 
+## Alloy Collections and Model support
+
+As of 1.0.5, RESTe now supports collection and model generation. So far I've got collections working and defintiions of models so you can iterate them, bind to controls etc. The framework is there to do the CRUD calls - that's next on my list.
+
+```javascript
+methods: [{
+        name: "getLocations",
+        get: "classes/locations",
+        model: {
+            name: "location",	  // the model name
+            id: "objectId", // the property to use as id for the model
+            collection: {
+                name: "locations", // the collection name
+                content: "results" // the property holding the results array
+            },
+        },
+        onLoad: function(e, callback) {
+
+            // Alloy.Collections.locationsnew.reset(e.results);
+            callback(e);
+        },
+        onError: function(e, callback) {
+            callback(e);
+        }
+    }]
+```
+
 ## To add
 
 * auto-config from remote API
 * better support for Session Tokens
-
-At this time, I won't be adding model support for Alloy. Happy to look at any PRs though! ;)
 
 ## License
 
