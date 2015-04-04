@@ -1,6 +1,6 @@
 # RESTe
 
-LATEST: Updated with support for collections and models in Alloy - currently reading collections is possible, full CRUD is support is coming ;)
+LATEST: Updated with support for collections and models in Alloy - currently supporting binding, create, delete, update methods on models.
 
 ## Why?
 
@@ -156,26 +156,38 @@ As of 1.0.5, RESTe now supports collection and model generation. So far I've got
 
 ### Defining methods with models / collections
 
+Using the following config you can configure end points that will still work as normal RESTe methods, but also give you collections and model support for CRUD.
+
 ```javascript
 methods: [{
         name: "getLocations",
         get: "classes/locations",
         model: {
-            name: "location",	  // the model name
-            id: "objectId", // the property to use as id for the model
+            name: "location",
+            id: "objectId",
+            update: "updateLocation",
+            create: "createLocation",
+            delete: "deleteLocation",
             collection: {
-                name: "locations", // the collection name
-                content: "results" // the property holding the results array
+                name: "locations",
+                content: "results"
             },
         },
-        onLoad: function(e, callback) {
-
-            // Alloy.Collections.locationsnew.reset(e.results);
+        onLoad: function(e, callback) {            
             callback(e);
         },
         onError: function(e, callback) {
             callback(e);
         }
+    }, {
+        name: "updateLocation",
+        put: "classes/locations/<objectId>"
+    }, {
+        name: "createLocation",
+        post: "classes/locations/"
+    }, {
+        name: "deleteLocation",
+        delete: "classes/locations/<objectId>"
     }]
 ```
 
