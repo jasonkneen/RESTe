@@ -136,6 +136,20 @@ api.addVideo({
 });
 ```
 
+Here's a PUT request example, passing an id (you'd need to ensure you have a <objectId> attribute in the method definition:
+
+```javascript
+api.updateVideo({
+	objectId: "123",
+    body: {
+        categoryId: 2,
+        name: "My Video2"
+    }
+}, function(video) {
+    // do stuff with the video
+});
+```
+
 ## Alloy Collections and Model support
 
 As of 1.0.5, RESTe now supports collection and model generation. So far I've got collections working and defintiions of models so you can iterate them, bind to controls etc. The framework is there to do the CRUD calls - that's next on my list.
