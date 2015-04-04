@@ -9,63 +9,6 @@ function log(message) {
     }
 }
 
-// Intercept sync to handle collections / models
-
-
-Backbone.sync = function(method, model, options) {
-    var modelConfig = exports[model._method].model
-
-    // if this is a collection, get the data and complete
-    if (model instanceof Backbone.Collection) {
-
-        exports[model._method](function(e) {
-
-            if (options.success) {
-
-                e[modelConfig.collection.content].forEach(function(model) {
-                    model.id = model.id || model[modelConfig.id];
-                });
-
-                options.success(e.results);
-            }
-        });
-
-    } else if (model instanceof Backbone.Model) {
-
-        if (method == "update") {
-            var body = {};
-
-            // update!
-            body[modelConfig.id] = model.id;
-            body.body = model;
-
-            exports[modelConfig.update](body, function(e) {
-                options.success(e);
-            });
-        }
-
-        if (method == "create") {
-            exports[modelConfig.create]({
-                body: model
-            }, function(e) {
-                e.id = e[modelConfig.id];
-                options.success(e);
-            });
-        }
-
-        if (method == "delete") {
-            var body = {};
-
-            body[modelConfig.id] = model.id;
-            body.body = model;
-
-            exports[modelConfig.delete](body, function(e) {
-                options.success(e);
-            });
-        }
-    }
-}
-
 
 // sets up the config, headers, adds methods
 exports.config = function(args) {
@@ -76,6 +19,10 @@ exports.config = function(args) {
 
     config.methods.forEach(function(method) {
         exports.addMethod(method);
+    });
+
+    config.models.forEach(function(model) {
+        exports.addModel(model);
     });
 };
 
@@ -218,8 +165,6 @@ exports.setRequestHeaders = function(headers) {
 exports.addMethod = function(args) {
     console.log(args.requestHeaders)
 
-
-
     exports[args.name] = function(params, onLoad) {
 
         var body,
@@ -305,43 +250,97 @@ exports.addMethod = function(args) {
             }
         }
     };
-
-    // add support for backbone collections
-    if (args.model) {
-
-        // storing a reference to the model definition in config
-        exports[args.name].model = args.model;
-
-        Alloy._createModel = Alloy.createModel;
-        Alloy.createModel = function(name, attributes) {
-            try {
-                return Alloy._createModel(name, attributes);
-            } catch (err) {
-                return exports.createModel(name, attributes);
-            }
-        }
-
-        exports.createModel = function(name, attributes) {
-            var model = new Backbone.Model(attributes);
-
-            model._type = name;
-            model._method = args.name;
-
-            return model;
-        };
-
-        if (args.model.collection && args.model.collection.name) {
-            Alloy.Collections[args.model.collection.name] = Alloy.Collections[args.model.collection.name] || new Backbone.Collection();
-            Alloy.Collections[args.model.collection.name]._method = args.name;
-
-            // create a model definition and associate it with the collection
-            if (args.model && args.model.name) {
-                Alloy.Collections[args.model.collection.name].model = Backbone.Model.extend({
-                    _type: args.model.name,
-                    _method: args.name
-                });
-            }
-        }
-
-    }
 };
+
+// Hacktastic section where we override the Alloy.createModel method
+Alloy._createModel = Alloy.createModel;
+
+Alloy.createModel = function(name, attributes) {
+    try {
+        return Alloy._createModel(name, attributes);
+    } catch (err) {
+        return exports.createModel(name, attributes);
+    }
+}
+
+exports.createModel = function(name, attributes) {
+    var model = new Backbone.Model(attributes);
+
+    model._type = name;
+
+    return model;
+};
+
+// add a new model definition
+exports.addModel = function(args) {
+    exports.modelConfig = exports.modelConfig || {};
+
+    // storing a reference to the model definition in config
+    exports.modelConfig[args.name] = args;
+
+    if (args.collection && args.collection.name) {
+        Alloy.Collections[args.collection.name] = Alloy.Collections[args.collection.name] || new Backbone.Collection();
+        //Alloy.Collections[args.collection.name]._method = args.name;
+        Alloy.Collections[args.collection.name]._type = args.name;
+
+        Alloy.Collections[args.collection.name].model = Backbone.Model.extend({
+            _type: args.name,
+            _method: args.name
+        });
+    }
+}
+
+// Intercept sync to handle collections / models
+Backbone.sync = function(method, model, options) {
+    console.log(method + model._type)
+
+    modelConfig = exports.modelConfig[model._type];
+
+    // if this is a collection, get the data and complete
+    if (model instanceof Backbone.Collection) {
+
+        exports[modelConfig.read](function(response) {
+
+            if (options.success) {
+                response[modelConfig.collection.content].forEach(function(item) {
+                    item.id = item[modelConfig.id];
+                });
+
+                options.success(response.results);
+            }
+        });
+
+    } else if (model instanceof Backbone.Model) {
+
+        if (method == "update") {
+            var body = {};
+
+            // update!
+            body[modelConfig.id] = model.id;
+            body.body = model;
+
+            exports[modelConfig.update](body, function(e) {
+                options.success(e);
+            });
+        }
+
+        if (method == "create") {
+            exports[modelConfig.create]({
+                body: model
+            }, function(e) {
+                e.id = e[modelConfig.id];
+                options.success(e);
+            });
+        }
+
+        if (method == "delete") {
+            var body = {};
+
+            body[modelConfig.id] = model.id;
+            body.body = model;
+            exports[modelConfig.delete](body, function(e) {
+                options.success(e);
+            });
+        }
+    }
+}
