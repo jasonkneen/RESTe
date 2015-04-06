@@ -292,16 +292,19 @@ function initModels() {
         // storing a reference to the model definition in config
         exports.modelConfig[args.name] = args;
 
-        if (args.collection && args.collection.name) {
-            Alloy.Collections[args.collection.name] = Alloy.Collections[args.collection.name] || new Backbone.Collection();
-            //Alloy.Collections[args.collection.name]._method = args.name;
-            Alloy.Collections[args.collection.name]._type = args.name;
+        var model = Backbone.Model.extend({
+            _type: args.name,
+            _method: args.name
+        });
 
-            Alloy.Collections[args.collection.name].model = Backbone.Model.extend({
-                _type: args.name,
-                _method: args.name
-            });
-        }
+        args.collections.forEach(function(collection) {
+            Alloy.Collections[collection.name] = Alloy.Collections[collection.name] || new Backbone.Collection();
+            Alloy.Collections[collection.name]._type = args.name;
+            Alloy.Collections[collection.name]._name = collection.name;
+            Alloy.Collections[collection.name].model = model;
+        });
+
+
     }
 
     // Intercept sync to handle collections / models
@@ -313,21 +316,23 @@ function initModels() {
         // if this is a collection, get the data and complete
         if (model instanceof Backbone.Collection) {
 
-            var methodCall = options.id ? exports[modelConfig.readById] : exports[modelConfig.read];
+            var collectionConfig = _.where(modelConfig.collections, {
+                name: model._name
+            })[0];
+            
+            var methodCall = exports[collectionConfig.read];
 
-            methodCall({
-                id: options.id
-            }, function(response) {
+            methodCall(options, function(response) {
 
                 if (options.success) {
 
-                    response[modelConfig.collection.content].forEach(function(item) {
+                    response[collectionConfig.content].forEach(function(item) {                        
                         item.id = item[modelConfig.id];
                     });
-
                     // check if we have a return property
-                    if (response[modelConfig.collection.content]) {
-                        options.success(response[modelConfig.collection.content]);
+                    if (response[collectionConfig.content]) {
+
+                        options.success(response[collectionConfig.content]);
                     } else {
                         // otherwise just return an array with the response                        
                         options.success([response]);
@@ -360,6 +365,7 @@ function initModels() {
             }
 
             if (method == "delete") {
+                alert('here')
                 var body = {};
 
                 body[modelConfig.id] = model.id;
