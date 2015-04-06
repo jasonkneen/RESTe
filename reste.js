@@ -104,6 +104,8 @@ function makeHttpRequest(args, onLoad, onError) {
         } else if (onLoad) {
             onLoad(response);
         }
+
+
     };
 
     http.onerror = function(e) {
@@ -125,6 +127,7 @@ function makeHttpRequest(args, onLoad, onError) {
     };
 
     function send() {
+
         // go
         if (args.params && (args.method === "POST" || args.method === "PUT")) {
             if (formEncode) {
@@ -134,6 +137,7 @@ function makeHttpRequest(args, onLoad, onError) {
             }
 
         } else {
+
             http.send();
         }
     }
@@ -247,6 +251,7 @@ exports.addMethod = function(args) {
             if (missing.length > 0) {
                 throw "RESTe :: missing parameter/s " + missing + " for method " + args.name
             } else {
+
                 makeHttpRequest({
                     url: url,
                     method: method,
@@ -308,14 +313,26 @@ function initModels() {
         // if this is a collection, get the data and complete
         if (model instanceof Backbone.Collection) {
 
-            exports[modelConfig.read](function(response) {
+            var methodCall = options.id ? exports[modelConfig.readById] : exports[modelConfig.read];
+
+            methodCall({
+                id: options.id
+            }, function(response) {
 
                 if (options.success) {
+
                     response[modelConfig.collection.content].forEach(function(item) {
                         item.id = item[modelConfig.id];
                     });
 
-                    options.success(response.results);
+                    // check if we have a return property
+                    if (response[modelConfig.collection.content]) {
+                        options.success(response[modelConfig.collection.content]);
+                    } else {
+                        // otherwise just return an array with the response                        
+                        options.success([response]);
+                    }
+
                 }
             });
 
