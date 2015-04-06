@@ -197,7 +197,11 @@ exports.addMethod = function(args) {
                     body = params[param];
                 } else {
                     while (url.indexOf("<" + param + ">") >= 0) {
-                        url = url.replace("<" + param + ">", params[param]);
+                        if (typeof params[param] == "object") {
+                            url = url.replace("<" + param + ">", JSON.stringify(params[param]));
+                        } else {
+                            url = url.replace("<" + param + ">", params[param]);
+                        }
                     }
                 }
             }
