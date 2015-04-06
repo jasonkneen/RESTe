@@ -364,8 +364,7 @@ function initModels() {
                 });
             }
 
-            if (method == "delete") {
-                alert('here')
+            if (method == "delete") {                
                 var body = {};
 
                 body[modelConfig.id] = model.id;
