@@ -236,16 +236,21 @@ exports.addMethod = function(args) {
             }, onLoad, onError);
 
         } else {
-            //work out which parameters are required
+
             var m, missing = [],
                 re = /(\<\w*\>)/g;
 
-            while ((m = re.exec(url)) != null) {
-                if (m.index === re.lastIndex) {
-                    re.lastIndex++;
+            //work out which parameters are required
+            if (config.autoValidateParams) {
+
+                while ((m = re.exec(url)) != null) {
+                    if (m.index === re.lastIndex) {
+                        re.lastIndex++;
+                    }
+
+                    missing.push(m[0]);
                 }
 
-                missing.push(m[0]);
             }
 
             if (missing.length > 0) {
@@ -319,14 +324,14 @@ function initModels() {
             var collectionConfig = _.where(modelConfig.collections, {
                 name: model._name
             })[0];
-            
+
             var methodCall = exports[collectionConfig.read];
 
             methodCall(options, function(response) {
 
                 if (options.success) {
 
-                    response[collectionConfig.content].forEach(function(item) {                        
+                    response[collectionConfig.content].forEach(function(item) {
                         item.id = item[modelConfig.id];
                     });
                     // check if we have a return property
@@ -364,7 +369,7 @@ function initModels() {
                 });
             }
 
-            if (method == "delete") {                
+            if (method == "delete") {
                 var body = {};
 
                 body[modelConfig.id] = model.id;
