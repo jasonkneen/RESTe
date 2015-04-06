@@ -67,6 +67,7 @@ var api = require("reste");
 
 api.config({
     debug: true, // allows logging to console of ::REST:: messages
+    autoValidateParams: false, // set to true to throw errors if <param> url properties are not passed
     timeout: 4000,
     url: "https://api.parse.com/1/",
     requestHeaders: {
