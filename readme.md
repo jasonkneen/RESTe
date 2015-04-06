@@ -156,30 +156,33 @@ As of 1.0.5, RESTe now supports collection and model generation. So far I've got
 
 ### Defining methods with models / collections
 
-Using the following config you can configure end points that will still work as normal RESTe methods, but also give you collections and model support for (C)reate, (R)ead, (U)pdate, (D)elete. 
+Using the following config you can configure end points that will still work as normal RESTe methods, but also give you collections and model support for (C)reate, (R)ead, (U)pdate, (D)elete. For Collection, I use an array of collections (since 1.0.9) which allows you have multiple endpoints configured as different collections using the same model. This enables use of say, Alloy.Collections.locations (for all locations) and Alloy.Collections.locationsByName (for locations by a specific parameter).
+
+(Ideally this should be more elegant, allowing the single locations collection in this case to be used to filter content but I needed a way to make this API independant and it's the best I can do for now!)
 
 ```javascript
- models: [{
+models: [{
         name: "location",
         id: "objectId",
-        create: "createLocation",
-        read: "getLocations",
+        create: "createLocation",        
         update: "updateLocation",
         delete: "deleteLocation",
-        collection: {
+        collections: [{
             name: "locations",
-            content: "results"
-        },
+            content: "results",
+            read: "getLocations"
+        }, {
+            name: "locationsByName",
+            content: "results",
+            read: "getLocationsByName"
+        }],
     }],
 methods: [{
         name: "getLocations",
-        get: "classes/locations",
-        onLoad: function(e, callback) {            
-            callback(e);
-        },
-        onError: function(e, callback) {
-            callback(e);
-        }
+        get: "classes/locations"
+    }, {
+        name: "getLocationsByName",
+        get: 'classes/locations?where={"name": "<name>"}'
     }, {
         name: "updateLocation",
         put: "classes/locations/<objectId>"
