@@ -214,6 +214,16 @@ and bind it to a tableview as follows:
  </TableView>
 ```
 
+### Creating new models and collections
+
+RESTe provides a couple of useful helper functions to create new models and collections - this is useful if you want to take an array of objects and turn them into a collection for easy binding.
+
+```javascript
+.createModel(name, attributes)
+.createCollection(name, array)
+```
+Each return either a model, or collection that can then be used with Alloy.
+
 ## To add
 
 * auto-config from remote API
