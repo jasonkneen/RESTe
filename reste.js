@@ -275,6 +275,26 @@ exports.addMethod = function(args) {
 // Hacktastic section where we override the Alloy.createModel method
 // only call and run this section if we need it; if models are defined
 
+exports.createModel = function(name, attributes) {
+    var model = new Backbone.Model(attributes);
+    model._type = name;
+    return model;
+};
+
+exports.createCollection = function(name, content) {
+
+    if (!Alloy.Collections[name]) {
+        Alloy.Collections[name] = new Backbone.Collection();
+    }
+
+    if (content instanceof Array) {
+        Alloy.Collections[name].reset(content);
+    } else {
+        throw "No Array specified for createCollection";
+    }
+
+}
+
 function initModels() {
     Alloy._createModel = Alloy.createModel;
 
@@ -287,24 +307,7 @@ function initModels() {
         }
     }
 
-    exports.createModel = function(name, attributes) {
-        var model = new Backbone.Model(attributes);
-        model._type = name;
-        return model;
-    };
 
-    exports.createCollection = function(name, content) {
-        if (Alloy.Collections[name]) {
-            throw "Collection " + name + " already exists!"
-        } else {
-            if (content instanceof Array) {
-                Alloy.Collections[name] = new Backbone.Collection();
-                Alloy.Collections[name].reset(content);
-            } else {
-                throw "No Array specified for createCollection";
-            }
-        }
-    }
 
     // add a new model definition
     exports.addModel = function(args) {
