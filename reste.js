@@ -298,18 +298,6 @@ exports.createCollection = function(name, content) {
 }
 
 function initModels() {
-    Alloy._createModel = Alloy.createModel;
-
-    Alloy.createModel = function(name, attributes) {
-
-        try {
-            return Alloy._createModel(name, attributes);
-        } catch (err) {
-            return exports.createModel(name, attributes);
-        }
-    }
-
-
 
     // add a new model definition
     exports.addModel = function(args) {
