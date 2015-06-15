@@ -87,6 +87,8 @@ function makeHttpRequest(args, onLoad, onError) {
 
             if (header == "Content-Type" && args.headers[header] == "application/x-www-form-urlencoded") {
                 formEncode = true;
+            } else if (header == "Content-Type" && args.headers[header] == "application/json") {
+                formEncode = false;
             }
 
             http.setRequestHeader(header, typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]);
