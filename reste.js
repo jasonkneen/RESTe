@@ -323,7 +323,7 @@ function initModels() {
     Backbone.sync = function(method, model, options) {
         console.log(method + model._type)
 
-        modelConfig = exports.modelConfig[model._type];
+        var modelConfig = exports.modelConfig[model._type];
 
         // if this is a collection, get the data and complete
         if (model instanceof Backbone.Collection) {
