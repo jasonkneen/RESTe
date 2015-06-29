@@ -311,12 +311,15 @@ function initModels() {
             _method: args.name
         });
 
-        args.collections.forEach(function(collection) {
-            Alloy.Collections[collection.name] = Alloy.Collections[collection.name] || new Backbone.Collection();
-            Alloy.Collections[collection.name]._type = args.name;
-            Alloy.Collections[collection.name]._name = collection.name;
-            Alloy.Collections[collection.name].model = model;
-        });
+        if (args.collections) {
+
+            args.collections.forEach(function(collection) {
+                Alloy.Collections[collection.name] = Alloy.Collections[collection.name] || new Backbone.Collection();
+                Alloy.Collections[collection.name]._type = args.name;
+                Alloy.Collections[collection.name]._name = collection.name;
+                Alloy.Collections[collection.name].model = model;
+            });
+        }
     }
 
     // Intercept sync to handle collections / models
@@ -364,6 +367,26 @@ function initModels() {
                 exports[modelConfig.update](body, function(e) {
                     options.success(e);
                 });
+            }
+
+            if (method == "read") {
+
+                if (modelConfig.read) {
+
+                    exports[modelConfig.read](options, function(e) {
+
+                        if (modelConfig.content) {
+
+                            var results = e[modelConfig.content];
+
+                            if (results.length == 1) {
+                                options.success(results[0]);
+                            }
+                        } else {
+                            options.success(e);
+                        }
+                    });
+                }
             }
 
             if (method == "create") {

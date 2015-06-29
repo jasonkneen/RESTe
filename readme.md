@@ -165,6 +165,8 @@ Using the following config you can configure end points that will still work as 
 models: [{
         name: "location",
         id: "objectId",
+        read: "getLocation",
+        //content: "results" <- use this is your method returns an array object
         create: "createLocation",        
         update: "updateLocation",
         delete: "deleteLocation",
@@ -182,6 +184,9 @@ methods: [{
         name: "getLocations",
         get: "classes/locations"
     }, {
+        name: "getLocation",
+        get: "classes/locations/<id>"
+    },{
         name: "getLocationsByName",
         get: 'classes/locations?where={"name": "<name>"}'
     }, {
