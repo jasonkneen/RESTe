@@ -219,6 +219,22 @@ and bind it to a tableview as follows:
  </TableView>
 ```
 
+To sort a collection, you need to set the comparator to the collection. Don't do this in the API configuration, but on the collection itself before you fetch it, like shown in the example below.
+
+Calling the sort function at any time after the fetch will try to sort. 
+
+```js
+Alloy.Collections.locations.comparator = function(a, b){
+	// do your sorting here, a & b will be models
+};
+
+Alloy.Collections.locations.fetch({
+	success: function(a,b,c){
+		Alloy.Collections.locations.sort();
+	}
+});
+```
+
 ### Creating new models and collections
 
 RESTe provides a couple of useful helper functions to create new models and collections - this is useful if you want to take an array of objects and turn them into a collection for easy binding.
