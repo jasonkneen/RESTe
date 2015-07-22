@@ -335,7 +335,7 @@ function initModels() {
                 name: model._name
             })[0];
 
-            var methodCall(options, function(response) {
+            methodCall(options, function(response) {
 
                 if (options.success && response[collectionConfig.content]) {
 
