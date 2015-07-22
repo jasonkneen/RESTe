@@ -337,23 +337,25 @@ function initModels() {
 
             var methodCall = exports[collectionConfig.read];
 
-            methodCall(options, function(response) {
+                        // check if we have a return property
+                        if (response[collectionConfig.content]) {
 
-                if (options.success) {
+                            response[collectionConfig.content].forEach(function(item) {
+                                item.id = item[modelConfig.id];
+                            });
 
-                    response[collectionConfig.content].forEach(function(item) {
-                        item.id = item[modelConfig.id];
-                    });
-                    // check if we have a return property
-                    if (response[collectionConfig.content]) {
-                        options.success(response[collectionConfig.content]);
-                    } else {
-                        // otherwise just return an array with the response                        
-                        options.success([response]);
+                            options.success(response[collectionConfig.content]);
+                        } else {
+                            // otherwise just return an array with the response 
+                            response.forEach(function(item) {
+                                item.id = item[modelConfig.id];
+                            });
+                            
+                            options.success([response]);
+                        }
+
                     }
-
-                }
-            });
+                });
 
         } else if (model instanceof Backbone.Model) {
 
