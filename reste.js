@@ -355,7 +355,7 @@ function initModels() {
                             item.id = item[modelConfig.id];
                         });
 
-                        options.success([response]);
+                        options.success(response);
                     }
 
                 }
