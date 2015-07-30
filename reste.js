@@ -77,7 +77,7 @@ function makeHttpRequest(args, onLoad, onError) {
             formEncode = true;
         }
 
-        http.setRequestHeader(header.name, typeof header.value == "function" ? header.value : header.value);
+        http.setRequestHeader(header.name, typeof header.value == "function" ? header.value() : header.value);
     });
 
     // non-global headers
