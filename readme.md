@@ -102,7 +102,31 @@ api.config({
 
 You can pass the _optional_ **onError** and **onLoad** handlers, which will intercept the error or retrieved data before it's passed to the calling function's callback. This way you can change, test, do-what-you-want-with-it before passing it on.
 
-You can also pass the onLoad and onError handlers within each method - to have a unique response from each. In all cases you always get two params which are the **response** and the **original callback** so you can pass it through, or stop the call.
+You can also pass the onLoad and onError handlers within each method - to have a unique response from each. In all cases you always get two params which are the **response**, the **original callback** (so you can pass it through, or stop the call) and the end point (used for caching data - see below).
+
+If for some reason the app needs to store a cache / local copy of remote data, a simple method can be used. See the example below for "courses" function call.
+
+    {   
+        name: "courses",
+        post: "functions/getCourses",
+        onLoad: function(data, callback, url) {
+            if (data) {
+                //save to local properties. If for example response is an object (otherwise use related method Ti.App.Properties.setList, etc.)
+                Ti.App.Properties.setObject(url, data);
+
+                callback(data);
+            }
+        }
+        onError: function(data, callback, url) {
+            //if interested in used 'cached' response - fetch from local properties
+            if (Ti.App.Properties.hasProperty(url)) {
+                //this callback is the same as onLoad
+                callback(Ti.App.Properties.getObject(url, data));
+            }
+        }
+    }
+
+
 
 If you specify parameters required e.g. **videoId** then RESTe will automatically check for these in the parameters passed to the method, and raise an error if they're missing.
 

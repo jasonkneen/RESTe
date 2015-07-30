@@ -215,14 +215,14 @@ exports.addMethod = function(args) {
 
             // change the callback to be the one specified
             onLoad = function(e) {
-                args.onLoad(e, originalOnLoad);
+                args.onLoad(e, originalOnLoad, url);
             }
         }
 
         if (args.onError) {
             // change the callback to be the one specified
             onError = function(e) {
-                args.onError(e, onLoad);
+                args.onError(e, onLoad, url);
             }
         }
 
