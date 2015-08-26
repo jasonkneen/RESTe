@@ -1,6 +1,6 @@
 # RESTe
 
-LATEST: Updated with support for collections and models in Alloy - currently supporting binding, create, delete, update methods on models.
+LATEST: BREAKING change with the latest 1.1.8 version -- this now supports multiple instances of RESTe configs and requires the it to be instantiated with the new operator.
 
 ## Why?
 
@@ -63,7 +63,8 @@ The main things I wanted were:-
 Wherever you want to initialise the API interface, put this:-
 
 ```javascript
-var api = require("reste");
+var reste = require("reste");
+var api = new reste();
 
 api.config({
     debug: true, // allows logging to console of ::REST:: messages
