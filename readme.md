@@ -220,6 +220,14 @@ and bind it to a tableview as follows:
  </TableView>
 ```
 
+You could also send parameters like follows:
+
+```javascript 
+Alloy.Collections.locationsByName.fetch({
+					name: "home"
+					});
+```
+
 To sort a collection, you need to set the comparator to the collection. Don't do this in the API configuration, but on the collection itself before you fetch it, like shown in the example below.
 
 Calling the sort function at any time after the fetch will try to sort. 
