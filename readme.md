@@ -154,7 +154,7 @@ api.updateVideo({
 
 ## Alloy Collections and Model support
 
-As of 1.0.5, RESTe now supports collection and model generation. So far I've got collections working and defintiions of models so you can iterate them, bind to controls etc. The framework is there to do the CRUD calls - that's next on my list.
+RESTe supports collection and model generation. So far I've got collections working and defintions of models so you can iterate them, bind to controls etc. You can also specify CRUD methods to Create, Update and Delete models.
 
 ### Defining methods with models / collections
 
