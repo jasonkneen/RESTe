@@ -110,7 +110,7 @@ If you specify parameters required e.g. **videoId** then RESTe will automaticall
 Once you've done all this (and assuming no errors), you'll have new methods available:
 
 ```javascript
-api.getAllVideos(function(videos) {
+api.getVideos(function(videos) {
     // do stuff with the videos here
 });
 ```
