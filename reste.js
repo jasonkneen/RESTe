@@ -4,7 +4,7 @@ var main = function() {
 
     // setup vars
     var config = {},
-        requestHeaders = []
+        requestHeaders = [];
 
     // generic log handler in DEV mode
     function log(message) {
@@ -35,7 +35,7 @@ var main = function() {
 
     };
 
-    // makes an http request to a URL, as a POST / GET / currently, 
+    // makes an http request to a URL, as a POST / GET / currently,
     // passing params and callback
     function makeHttpRequest(args, onLoad, onError) {
 
@@ -50,7 +50,7 @@ var main = function() {
 
         function parseJSON(text) {
             if (isJSON(text)) {
-                return JSON.parse(text)
+                return JSON.parse(text);
             } else {
                 return text;
             }
@@ -86,7 +86,7 @@ var main = function() {
         // non-global headers
         if (args.headers) {
             // load up any request headers
-            for (header in args.headers) {
+            for (var header in args.headers) {
 
                 if (header == "Content-Type" && args.headers[header] == "application/x-www-form-urlencoded") {
                     formEncode = true;
@@ -102,7 +102,6 @@ var main = function() {
 
         // events
         http.onload = function(e) {
-
             // get the response parsed
             var response = parseJSON(http.responseText);
 
@@ -119,14 +118,14 @@ var main = function() {
             e.url = args.url;
 
             if (onError) {
-                // if we have an onError method, use it            
-                onError(parseJSON(http.responseText))
+                // if we have an onError method, use it
+                onError(parseJSON(http.responseText));
             } else if (config.onError) {
-                // otherwise fallback to the one specified in config                        
-                config.onError(parseJSON(http.responseText))
+                // otherwise fallback to the one specified in config
+                config.onError(parseJSON(http.responseText));
             } else if (onLoad) {
                 // otherwise revert to the onLoad callback
-                onLoad(parseJSON(http.responseText))
+                onLoad(parseJSON(http.responseText));
             } else {
                 // and if reste's not specified, error!
                 throw "RESTe :: No error handler / callback for: " + args.url;
@@ -171,7 +170,7 @@ var main = function() {
     // set Requestheaders
     reste.setRequestHeaders = function(headers) {
         requestHeaders = [];
-        for (header in headers) {
+        for (var header in headers) {
             requestHeaders.push({
                 name: header,
                 value: headers[header]
@@ -181,7 +180,7 @@ var main = function() {
 
     // add a new method
     reste.addMethod = function(args) {
-        console.log(args.requestHeaders)
+        console.log(args.requestHeaders);
 
         reste[args.name] = function(params, onLoad, onError) {
 
@@ -200,7 +199,7 @@ var main = function() {
             if (!onLoad && typeof(params) == "function") {
                 onLoad = params;
             } else {
-                for (param in params) {
+                for (var param in params) {
                     if (param === "body") {
                         body = params[param];
                     } else {
@@ -222,21 +221,21 @@ var main = function() {
                 // change the callback to be the one specified
                 onLoad = function(e) {
                     args.onLoad(e, originalOnLoad);
-                }
+                };
             }
 
             if (args.onError) {
                 // change the callback to be the one specified
                 onError = function(e) {
                     args.onError(e, onLoad);
-                }
+                };
             }
 
             if (args.expects) {
                 // look for explicityly required parameters
                 args.expects.forEach(function(expectedParam) {
                     if ((method == "POST" && params.body) ? !params.body[expectedParam] : !params[expectedParam]) {
-                        throw "RESTe :: missing parameter " + expectedParam + " for method " + args.name
+                        throw "RESTe :: missing parameter " + expectedParam + " for method " + args.name;
                     }
                 });
 
@@ -255,7 +254,7 @@ var main = function() {
                 //work out which parameters are required
                 if (config.autoValidateParams) {
 
-                    while ((m = re.exec(url)) != null) {
+                    while ((m = re.exec(url)) !== null) {
                         if (m.index === re.lastIndex) {
                             re.lastIndex++;
                         }
@@ -266,7 +265,7 @@ var main = function() {
                 }
 
                 if (missing.length > 0) {
-                    throw "RESTe :: missing parameter/s " + missing + " for method " + args.name
+                    throw "RESTe :: missing parameter/s " + missing + " for method " + args.name;
                 } else {
 
                     makeHttpRequest({
@@ -301,7 +300,7 @@ var main = function() {
             throw "No Array specified for createCollection";
         }
 
-    }
+    };
 
     function initModels() {
 
@@ -326,17 +325,17 @@ var main = function() {
                     Alloy.Collections[collection.name].model = model;
                 });
             }
-        }
+        };
 
         // Intercept sync to handle collections / models
         Backbone.sync = function(method, model, options) {
-            console.log(method + model._type)
+            console.log(method + model._type);
 
             var modelConfig = reste.modelConfig[model._type];
+            var body;
 
             // if this is a collection, get the data and complete
             if (model instanceof Backbone.Collection) {
-
                 var collectionConfig = _.where(modelConfig.collections, {
                     name: model._name
                 })[0];
@@ -356,11 +355,11 @@ var main = function() {
 
                             options.success(response[collectionConfig.content]);
                         } else {
-                            // otherwise just return an array with the response 
+                            // otherwise just return an array with the response
                             response.forEach(function(item) {
                                 item.id = item[modelConfig.id];
                             });
-                            
+
                             options.success(response);
                         }
 
@@ -370,7 +369,7 @@ var main = function() {
             } else if (model instanceof Backbone.Model) {
 
                 if (method == "update") {
-                    var body = {};
+                    body = {};
 
                     // update!
                     body[modelConfig.id] = model.id;
@@ -395,6 +394,7 @@ var main = function() {
                                     options.success(results[0]);
                                 }
                             } else {
+
                                 options.success(e);
                             }
                         });
@@ -411,7 +411,7 @@ var main = function() {
                 }
 
                 if (method == "delete") {
-                    var body = {};
+                    body = {};
 
                     body[modelConfig.id] = model.id;
                     body.body = model;
@@ -420,7 +420,7 @@ var main = function() {
                     });
                 }
             }
-        }
+        };
     }
 
     return reste;
