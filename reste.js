@@ -183,7 +183,7 @@ var main = function() {
     reste.addMethod = function(args) {
         console.log(args.requestHeaders)
 
-        reste[args.name] = function(params, onLoad) {
+        reste[args.name] = function(params, onLoad, onError) {
 
             var body,
                 method = "GET",
