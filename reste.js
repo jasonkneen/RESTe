@@ -366,7 +366,10 @@ var main = function() {
 
                             options.success(response);
                         }
-
+                    }
+                }, function(response) {
+                    if (options.error) {
+                        options.error(response)
                     }
                 });
 
