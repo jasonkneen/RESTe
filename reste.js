@@ -35,6 +35,10 @@ var main = function() {
 
     };
 
+    reste.setUrl = function(url) {
+        config.url = url || config.url
+    };
+
     // makes an http request to a URL, as a POST / GET / currently,
     // passing params and callback
     function makeHttpRequest(args, onLoad, onError) {
