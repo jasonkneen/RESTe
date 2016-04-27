@@ -302,6 +302,24 @@ var main = function() {
     reste.createModel = function(name, attributes) {
         var model = new Backbone.Model(attributes);
         model._type = name;
+
+        var args = reste.modelConfig[name];
+
+        if (args.transform) {
+            var transform = function(model, transform) {
+                if (transform) {
+                    // if we pass a custom transform function, use that
+                    model.__transform = transform(model);
+                } else if (args.transform) {
+                    // otherwise use the config transform
+                    model.__transform = args.transform(model);
+                }
+                return model.__transform;
+            }
+        }
+
+        model.transform = transform ? transform : null;
+
         return model;
     };
 
@@ -328,9 +346,23 @@ var main = function() {
             // storing a reference to the model definition in config
             reste.modelConfig[args.name] = args;
 
+            if (args.transform) {
+                var transform = function(model, transform) {
+                    if (transform) {
+                        // if we pass a custom transform function, use that
+                        model.__transform = transform(model);
+                    } else if (args.transform) {
+                        // otherwise use the config transform
+                        model.__transform = args.transform(model);
+                    }
+                    return model.__transform;
+                }
+            }
+
             var model = Backbone.Model.extend({
                 _type: args.name,
-                _method: args.name
+                _method: args.name,
+                transform: transform ? transform : null
             });
 
             if (args.collections) {
