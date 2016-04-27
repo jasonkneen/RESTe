@@ -70,6 +70,10 @@ var main = function() {
         // create a client
         var http = Ti.Network.createHTTPClient();
 
+        reste.clearCookies = function() {
+            http && http.clearCookies(config.url);
+        };
+
         var formEncode = false;
 
         //set some defaults
