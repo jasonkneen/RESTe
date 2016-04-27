@@ -125,15 +125,24 @@ var main = function() {
         http.onerror = function(e) {
             e.url = args.url;
 
+            function retry() {
+                log("Retrying");
+                makeHttpRequest(args, onLoad, onError)
+            }
+
             if (onError) {
                 // if we have an onError method, use it
-                onError(parseJSON(http.responseText));
+                onError(parseJSON(http.responseText), retry);
+
+                // if the local error returns, we get here
+                config.onError && config.onError(parseJSON(http.responseText), retry);
+
             } else if (config.onError) {
                 // otherwise fallback to the one specified in config
-                config.onError(parseJSON(http.responseText));
+                config.onError(parseJSON(http.responseText), retry);
             } else if (onLoad) {
                 // otherwise revert to the onLoad callback
-                onLoad(parseJSON(http.responseText));
+                onLoad(parseJSON(http.responseText), retry);
             } else {
                 // and if reste's not specified, error!
                 throw "RESTe :: No error handler / callback for: " + args.url;
