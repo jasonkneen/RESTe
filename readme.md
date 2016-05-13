@@ -1,14 +1,12 @@
 # RESTe
 
-LATEST: BREAKING change with the latest 1.1.8 version -- this now supports multiple instances of RESTe configs and requires the it to be instantiated with the new operator.
-
 ## Why?
 
-I build a lot of apps that integrate with APIs. These could be written in cloud services like Parse.com etc, but more often they are custom APIs written by another developer. I was using a basic api.js library to handle the API integration, but this involved implementing the api.js file into a separate library file specific to the project.
+I build a lot of apps that integrate with APIs. These could be written using the open-source Parse Server or a hosted service, but more often they are custom APIs written by another developer. I used to use a basic api.js library to handle the API integration, but this typically involved writing my own module for the API in question, requiring the api.js module, and writing specific methods for the app.
 
 ### The Old Way 
 
-Previously I'd end up writing methods like this:
+So previously I'd end up writing methods like this:
 
 ```JS
 exports.getPreviousLocations = function(callback) {
@@ -47,24 +45,26 @@ _(The processResponse function was written to try to parse the data as it came b
 
 ## A New Way - Using RESTe
 
-So the idea behind RESTe was to have a single JS library I could drop in a project, then apply a simple config to it and have *it* generate the methods for me.
+The idea behind RESTe was to have a single JS library I could drop in a project, apply a simple config, and have *it* generate the methods for me.
 
-The main things I wanted were:-
+The main things I wanted to achieve were:-
 
 * Simple to implement in an new project, or replace an existing API layer
 * Supports headers, tokens, events
 * Minimal code
 
-
 ## Quick Start
-* [Download the latest version](https://github.com/jasonkneen/reste).
-* Place in your lib folder
+* [Install from NPM the latest version](https://www.npmjs.com/package/reste)
+or
+* [Download the latest version](https://github.com/jasonkneen/reste) and place in your project (lib folder for Alloy).
 
 Wherever you want to initialise the API interface, put this:-
 
 ```javascript
 var reste = require("reste");
 var api = new reste();
+
+// now we can do our one-time configure
 
 api.config({
     debug: true, // allows logging to console of ::REST:: messages
@@ -92,8 +92,17 @@ api.config({
         name: "addVideo",
         post: "classes/videos"
     }],
-    onError: function(e) {
-        alert("There was an error accessing the API");
+    onError: function(e, retry) {
+        var dialog = Ti.UI.createAlertDialog({
+            title: "Connection error",
+            message: "There was an error connecting to the server, check your network connection and  retry.",
+            buttonNames: ['Retry']
+        });
+
+        dialog.addEventListener("click", function() {
+            retry();
+        });
+        dialog.show();
     },
     onLoad: function(e, callback) {
         callback(e);
@@ -103,7 +112,9 @@ api.config({
 
 You can pass the _optional_ **onError** and **onLoad** handlers, which will intercept the error or retrieved data before it's passed to the calling function's callback. This way you can change, test, do-what-you-want-with-it before passing it on.
 
-You can also pass the onLoad and onError handlers within each method - to have a unique response from each. In all cases you always get two params which are the **response** and the **original callback** so you can pass it through, or stop the call.
+Note, in the **onError** handler, you can (as of 1.2.0) also handle any network errors better -- in the example above a **retry** method is returned so you can check the error, display a specific one, or handle any network issues, and if required, issue a **retry()** which will attempt the last call again.
+
+You can also pass the **onLoad** and **onError** handlers within each method - to have a unique response from each. In all cases you always get two params which are the **response** and the **original callback** so you can pass it through, or stop the call. Again with **onError** you can perform a **retry()** at a local level.
 
 If you specify parameters required e.g. **videoId** then RESTe will automatically check for these in the parameters passed to the method, and raise an error if they're missing.
 
@@ -151,10 +162,62 @@ api.updateVideo({
     // do stuff with the video
 });
 ```
+## Helper functions
+
+There are a couple of new functions to help in a couple of areas -- firstly, being able to swap out the base URL of your API -- useful if you're developing and need to switch servers in the app. The second method supports clearing any cookies from the RESTe http client.
+
+The following will temporarily change the config base URL:
+
+```javascript
+api.setUrl("http://whatever");
+```
+
+(this is lost if you restart the app)
+
+The following will clear any cookies from the baseUrl:
+
+```javascript
+api.clearCookies();
+```
 
 ## Alloy Collections and Model support
 
-RESTe supports collection and model generation. So far I've got collections working and defintions of models so you can iterate them, bind to controls etc. You can also specify CRUD methods to Create, Update and Delete models.
+RESTe supports collection and model generation. So it supports creating and managing collections and models, binding, and CRUD methods to Create, Update and Delete models.
+
+As of 1.2.0 you can also now perform transform functions at a global (config) level or locally in a controller / view -- this is really useful if you use Alloy and pass models to views using **$model** 
+
+In the following example, we've defined a method called **getExpenseQueueFull** elsewhere in the config that gets expense details, and then defined a **transform** function in the config:
+
+```javascript
+models: [{
+        name: "expense",
+        id: "unid",
+        read: "getExpenseById",
+        content: "retArray",
+        transform: function(m) {
+            m = m.toJSON();
+            m.hotelAllowance && (m.hotelAllowance = "£" + parseFloat(m.hotelAllowance).toFixed(2));
+            m.mileage && (m.mileage = "£" + parseFloat(m.mileage).toFixed(2));
+            m.other && (m.other = "£" + parseFloat(m.other).toFixed(2));
+            m.total && (m.total = "£" + parseFloat(m.total).toFixed(2));
+            return m;
+        },
+        collections: [{
+            name: "expenses",
+            content: "retArray",
+            read: "getExpensesQueueFull"
+        }],
+    }
+```
+So now whenever you want to transform the model, you can do so within a local transform function as follows:
+
+```javascript
+function transform(model) {
+    var m = model.transform(model);
+    return m;
+}```
+
+You can also pass an optional transform parameter in the transform function, which will override the global transform method.
 
 ### Defining methods with models / collections
 
@@ -254,15 +317,10 @@ RESTe provides a couple of useful helper functions to create new models and coll
 ```
 Each return either a model, or collection that can then be used with Alloy.
 
-## To add
-
-* auto-config from remote API
-* better support for Session Tokens
-
 ## License
 
 <pre>
-Copyright 2015 Jason Kneen
+Copyright 2016 Jason Kneen
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
