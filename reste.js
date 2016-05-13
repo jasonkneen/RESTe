@@ -36,7 +36,7 @@ var main = function() {
     };
 
     reste.setUrl = function(url) {
-        config.url = url || config.url
+        config.url = url || config.url;
     };
 
     // makes an http request to a URL, as a POST / GET / currently,
@@ -127,7 +127,7 @@ var main = function() {
 
             function retry() {
                 log("Retrying");
-                makeHttpRequest(args, onLoad, onError)
+                makeHttpRequest(args, onLoad, onError);
             }
 
             if (onError) {
