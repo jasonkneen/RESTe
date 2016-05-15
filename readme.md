@@ -215,7 +215,8 @@ So now whenever you want to transform the model, you can do so within a local tr
 function transform(model) {
     var m = model.transform(model);
     return m;
-}```
+}
+```
 
 You can also pass an optional transform parameter in the transform function, which will override the global transform method.
 
