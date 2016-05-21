@@ -4,8 +4,7 @@ var main = function() {
 
     // setup vars
     var config = {},
-        requestHeaders = [],
-        Q;
+        requestHeaders = [];
 
     // generic log handler in DEV mode
     function log(message) {
@@ -32,10 +31,6 @@ var main = function() {
             config.models.forEach(function(model) {
                 reste.addModel(model);
             });
-        }
-        
-        if (config.Q) {
-            Q = config.Q;
         }
 
     };
@@ -219,8 +214,8 @@ var main = function() {
 
             url = args[method.toLowerCase()] || args.get;
             
-            if (Q && !onLoad && !onError) {
-                deferred = Q.defer();
+            if (config.Q && !onLoad && typeof(params) != "function" ) {
+                deferred = config.Q.defer();
                 onLoad = deferred.resolve;
                 onError = deferred.reject;
             }
