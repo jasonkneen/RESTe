@@ -197,7 +197,9 @@ var main = function() {
 
     // add a new method
     reste.addMethod = function(args) {
-        console.log(args.requestHeaders);
+        if (config.debug) {
+            console.log(args.requestHeaders);
+        }
 
         reste[args.name] = function(params, onLoad, onError) {
 
@@ -378,7 +380,10 @@ var main = function() {
 
         // Intercept sync to handle collections / models
         Backbone.sync = function(method, model, options) {
-            console.log(method + model._type);
+            if (config.debug) {
+                console.log(method + model._type);    
+            }
+            
 
             var modelConfig = reste.modelConfig[model._type];
             var body;
