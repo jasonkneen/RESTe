@@ -163,6 +163,31 @@ api.updateVideo({
     // do stuff with the video
 });
 ```
+## Promise support with q.js
+[Download the q.js](https://github.com/kriskowal/q) and place in your project (lib folder for Alloy). Then pass it to config as Q property.
+
+```javascript
+api.config({
+    Q: require('q'),
+    ...
+});
+```
+
+Examples using Promise
+
+```javascript
+api.getVideos().then(function(videos){}).then(...).catch(...);
+```
+Or call a method with a specific Id:
+
+```javascript
+api.getVideoById({
+    videoId: "fUAM4ZFj9X" 
+}).then(function(video) {
+    // do stuff with the video
+});
+```
+
 ## Helper functions
 
 There are a couple of new functions to help in a couple of areas -- firstly, being able to swap out the base URL of your API -- useful if you're developing and need to switch servers in the app. The second method supports clearing any cookies from the RESTe http client.
