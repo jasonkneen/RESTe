@@ -78,6 +78,9 @@ var main = function() {
 
         //set some defaults
         http.setTimeout(config.timeout || 10000);
+        if (config.validatesSecureCertificate) {
+            http.setValidatesSecureCertificate(config.validatesSecureCertificate);
+        }
 
         // open the url
         http.open(args.method, (config.url ? config.url + args.url : args.url));
