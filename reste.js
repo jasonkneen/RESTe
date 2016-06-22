@@ -209,7 +209,8 @@ var main = function() {
             var body,
                 method = "GET",
                 url,
-                onError;
+                onError,
+                deferred;
 
             if (args.post) method = "POST";
             if (args.get) method = "GET";
@@ -217,7 +218,13 @@ var main = function() {
             if (args.delete) method = "DELETE";
 
             url = args[method.toLowerCase()] || args.get;
-
+            
+            if (config.Q && !onLoad && typeof(params) != "function" ) {
+                deferred = config.Q.defer();
+                onLoad = deferred.resolve;
+                onError = deferred.reject;
+            }
+            
             if (!onLoad && typeof(params) == "function") {
                 onLoad = params;
             } else {
@@ -297,6 +304,10 @@ var main = function() {
                         headers: args.requestHeaders || args.headers,
                     }, onLoad, onError);
                 }
+            }
+            
+            if (deferred) {
+                return deferred.promise;
             }
         };
     };
