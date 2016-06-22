@@ -69,6 +69,7 @@ var api = new reste();
 api.config({
     debug: true, // allows logging to console of ::REST:: messages
     autoValidateParams: false, // set to true to throw errors if <param> url properties are not passed
+    validatesSecureCertificate: false, // set to true to force SSL certificate on HTTPS calls to be valid
     timeout: 4000,
     url: "https://api.parse.com/1/",
     requestHeaders: {
