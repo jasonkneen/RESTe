@@ -197,6 +197,25 @@ var main = function() {
             });
         }
     };
+    
+    // change/add requestHeader
+    reste.changeRequestHeader = function(header) {
+        var changed = false;
+        
+        _.each(requestHeaders, function(item){
+            if (item.name == Object.keys(header)){
+                item.value = header[Object.keys(header)];
+                changed = true;
+            }
+        });
+        if (!changed) {
+            // add it
+            requestHeaders.push({
+                name: Object.keys(header),
+                value: header[Object.keys(header)]
+            });
+        }
+    };
 
     // add a new method
     reste.addMethod = function(args) {
