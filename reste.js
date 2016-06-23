@@ -78,7 +78,7 @@ var main = function() {
 
         //set some defaults
         http.setTimeout(config.timeout || 10000);
-        if (config.validatesSecureCertificate) {
+        if (_.has(config, 'validatesSecureCertificate')) {
             http.setValidatesSecureCertificate(config.validatesSecureCertificate);
         }
 
