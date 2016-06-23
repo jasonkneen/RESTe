@@ -91,7 +91,7 @@ var main = function() {
                 formEncode = true;
             }
 
-            http.setRequestHeader(header.name, typeof header.value == "function" ? header.value : header.value);
+            http.setRequestHeader(header.name, typeof header.value == "function" ? header.value() : header.value);
         });
 
         // non-global headers
@@ -218,13 +218,13 @@ var main = function() {
             if (args.delete) method = "DELETE";
 
             url = args[method.toLowerCase()] || args.get;
-            
+
             if (config.Q && !onLoad && typeof(params) != "function" ) {
                 deferred = config.Q.defer();
                 onLoad = deferred.resolve;
                 onError = deferred.reject;
             }
-            
+
             if (!onLoad && typeof(params) == "function") {
                 onLoad = params;
             } else {
@@ -305,7 +305,7 @@ var main = function() {
                     }, onLoad, onError);
                 }
             }
-            
+
             if (deferred) {
                 return deferred.promise;
             }
@@ -395,9 +395,9 @@ var main = function() {
         // Intercept sync to handle collections / models
         Backbone.sync = function(method, model, options) {
             if (config.debug) {
-                console.log(method + model._type);    
+                console.log(method + model._type);
             }
-            
+
 
             var modelConfig = reste.modelConfig[model._type];
             var body;
