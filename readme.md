@@ -58,7 +58,7 @@ The main things I wanted to achieve were:-
 or
 * [Download the latest version](https://github.com/jasonkneen/reste) and place in your project (lib folder for Alloy).
 
-Wherever you want to initialise the API interface, put this:-
+Wherever you want to initialise the API interface, put this (ideally this should go in your alloy.js or index.js file):-
 
 ```javascript
 var reste = require("reste");
