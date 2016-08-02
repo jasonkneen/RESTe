@@ -203,16 +203,16 @@ var main = function() {
         var changed = false;
         
         _.each(requestHeaders, function(item){
-            if (item.name == Object.keys(header)){
-                item.value = header[Object.keys(header)];
+            if (item.name == Object.keys(header)[0]){
+                item.value = header[Object.keys(header)[0]];
                 changed = true;
             }
         });
         if (!changed) {
             // add it
             requestHeaders.push({
-                name: Object.keys(header),
-                value: header[Object.keys(header)]
+                name: Object.keys(header)[0],
+                value: header[Object.keys(header)[0]]
             });
         }
     };
