@@ -103,8 +103,6 @@ var main = function() {
                     formEncode = true;
                 } else if (header == "Content-Type" && args.headers[header] == "application/json") {
                     formEncode = false;
-                } else {
-                    formEncode = true;
                 }
 
                 http.setRequestHeader(header, typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]);
