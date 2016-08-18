@@ -348,7 +348,7 @@ var main = function() {
                     model.__transform = args.transform(model);
                 }
                 return model.__transform;
-            }
+            };
         }
 
         model.transform = transform ? transform : null;
@@ -389,7 +389,7 @@ var main = function() {
                         model.__transform = args.transform(model);
                     }
                     return model.__transform;
-                }
+                };
             }
 
             var model = Backbone.Model.extend({
@@ -450,7 +450,7 @@ var main = function() {
                     }
                 }, function(response) {
                     if (options.error) {
-                        options.error(response)
+                        options.error(response);
                     }
                 });
 
@@ -473,7 +473,6 @@ var main = function() {
 
                     reste[modelConfig.update](params, function(e) {
                         // calls error handler if we have it defined and 201 returned
-                        alert(e)
                         if (e.code > 200) {
                             if (options.error) {
                                 options.error(e);
@@ -521,7 +520,7 @@ var main = function() {
 
                 if (method == "create") {
 
-                    var body = model.toJSON();
+                    body = model.toJSON();
 
                     // remove any ids from the body
                     delete body.id;
@@ -544,6 +543,7 @@ var main = function() {
                 }
 
                 if (method == "delete") {
+
                     body = {};
 
                     body[modelConfig.id] = model.id;
