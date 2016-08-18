@@ -238,7 +238,7 @@ var main = function() {
 
             url = args[method.toLowerCase()] || args.get;
 
-            if (config.Q && !onLoad && typeof(params) != "function" ) {
+            if (config.Q && !onLoad && typeof(params) != "function") {
                 deferred = config.Q.defer();
                 onLoad = deferred.resolve;
                 onError = deferred.reject;
