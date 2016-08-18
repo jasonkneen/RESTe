@@ -456,16 +456,25 @@ var main = function() {
 
             } else if (model instanceof Backbone.Model) {
 
+                if (model.id && method == "create") {
+                    method = "update";
+                }
+
                 if (method == "update") {
-                    body = {};
+                    params = {};
 
                     // update!
-                    body[modelConfig.id] = model.id;
-                    body.body = model;
+                    params[modelConfig.id] = model.id;
+                    params.body = model.toJSON();
 
-                    reste[modelConfig.update](body, function(e) {
+                    // remove any ids from the body
+                    delete params.body.id;
+                    delete params.body[modelConfig.id];
+
+                    reste[modelConfig.update](params, function(e) {
                         // calls error handler if we have it defined and 201 returned
-                            if (e.code > 200) {
+                        alert(e)
+                        if (e.code > 200) {
                             if (options.error) {
                                 options.error(e);
                             }
@@ -479,6 +488,12 @@ var main = function() {
                 if (method == "read") {
 
                     if (modelConfig.read) {
+
+                        if (model[modelConfig.id]) {
+                            options[modelConfig.id] = model[modelConfig.id];
+                        } else if (model.id) {
+                            options[modelConfig.id] = model.id;
+                        }
 
                         reste[modelConfig.read](options, function(e) {
 
@@ -505,8 +520,15 @@ var main = function() {
                 }
 
                 if (method == "create") {
+
+                    var body = model.toJSON();
+
+                    // remove any ids from the body
+                    delete body.id;
+                    delete body[modelConfig.id];
+
                     reste[modelConfig.create]({
-                        body: model
+                        body: body
                     }, function(e) {
                         // calls error handler if we have it defined and 201+ returned
                         if (e.code > 200) {
