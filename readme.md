@@ -1,5 +1,9 @@
 # RESTe
 
+## Important note
+
+RESTe tries to make sense of the data that comes back but currently it will have problems with invalid JSON data. If you're having any issues with data not being rendered / bound, check it's valid JSON so everything is wrapped as a string. JSON has real issues with numbers -- if it's a normal number it's fine but putting in say 000000 for a property can cause issues in parsing. 
+
 ## Why?
 
 I build a lot of apps that integrate with APIs. These could be written using the open-source Parse Server or a hosted service, but more often they are custom APIs written by another developer. I used to use a basic api.js library to handle the API integration, but this typically involved writing my own module for the API in question, requiring the api.js module, and writing specific methods for the app.
