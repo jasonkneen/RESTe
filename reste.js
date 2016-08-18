@@ -154,8 +154,8 @@ var main = function() {
 
             // go
             if (args.params && (args.method === "POST" || args.method === "PUT")) {
-                if (formEncode) {
 
+                if (formEncode) {
                     http.send(args.params);
                 } else {
                     http.send(JSON.stringify(args.params));
@@ -195,13 +195,13 @@ var main = function() {
             });
         }
     };
-    
+
     // change/add requestHeader
     reste.changeRequestHeader = function(header) {
         var changed = false;
-        
-        _.each(requestHeaders, function(item){
-            if (item.name == Object.keys(header)[0]){
+
+        _.each(requestHeaders, function(item) {
+            if (item.name == Object.keys(header)[0]) {
                 item.value = header[Object.keys(header)[0]];
                 changed = true;
             }
@@ -506,7 +506,7 @@ var main = function() {
                                 }
                             } else {
                                 // calls error handler if we have it defined and 201+ returned
-                                    if (e.code > 200) {
+                                if (e.code > 200) {
                                     if (options.error) {
                                         options.error(e);
                                     }
