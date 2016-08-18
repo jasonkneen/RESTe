@@ -466,7 +466,15 @@ var main = function() {
                     body.body = model;
 
                     reste[modelConfig.update](body, function(e) {
-                        options.success(e);
+                        // calls error handler if we have it defined and 201 returned
+                            if (e.code > 200) {
+                            if (options.error) {
+                                options.error(e);
+                            }
+                        } else {
+                            // otherwise pass to success
+                            options.success(e);
+                        }
                     });
                 }
 
@@ -484,8 +492,15 @@ var main = function() {
                                     options.success(results[0]);
                                 }
                             } else {
-
-                                options.success(e);
+                                // calls error handler if we have it defined and 201+ returned
+                                    if (e.code > 200) {
+                                    if (options.error) {
+                                        options.error(e);
+                                    }
+                                } else {
+                                    // otherwise pass to success
+                                    options.success(e);
+                                }
                             }
                         });
                     }
@@ -495,8 +510,16 @@ var main = function() {
                     reste[modelConfig.create]({
                         body: model
                     }, function(e) {
-                        e.id = e[modelConfig.id];
-                        options.success(e);
+                        // calls error handler if we have it defined and 201+ returned
+                        if (e.code > 200) {
+                            if (options.error) {
+                                options.error(e);
+                            }
+                        } else {
+                            // otherwise pass to success
+                            e.id = e[modelConfig.id];
+                            options.success(e);
+                        }
                     });
                 }
 
@@ -506,7 +529,15 @@ var main = function() {
                     body[modelConfig.id] = model.id;
                     body.body = model;
                     reste[modelConfig.delete](body, function(e) {
-                        options.success(e);
+                        // calls error handler if we have it defined and 201+ returned
+                        if (e.code > 200) {
+                            if (options.error) {
+                                options.error(e);
+                            }
+                        } else {
+                            // otherwise pass to success
+                            options.success(e);
+                        }
                     });
                 }
             }
