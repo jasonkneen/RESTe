@@ -214,7 +214,7 @@ api.clearCookies();
 
 RESTe supports collection and model generation. So it supports creating and managing collections and models, binding, and CRUD methods to Create, Update and Delete models.
 
-As of 1.2.0 you can also now perform transform functions at a global (config) level or locally in a controller / view -- this is really useful if you use Alloy and pass models to views using **$model** 
+You can also now perform transform functions at a global (config) level or locally in a controller / view -- this is really useful if you use Alloy and pass models to views using **$model** 
 
 In the following example, we've defined a method called **getExpenseQueueFull** elsewhere in the config that gets expense details, and then defined a **transform** function in the config:
 
@@ -252,7 +252,7 @@ You can also pass an optional transform parameter in the transform function, whi
 
 ### Defining methods with models / collections
 
-Using the following config you can configure end points that will still work as normal RESTe methods, but also give you collections and model support for (C)reate, (R)ead, (U)pdate, (D)elete. For Collection, I use an array of collections (since 1.0.9) which allows you have multiple endpoints configured as different collections using the same model. This enables use of say, Alloy.Collections.locations (for all locations) and Alloy.Collections.locationsByName (for locations by a specific parameter).
+Using the following config you can configure end points that will still work as normal RESTe methods, but also give you collections and model support for (C)reate, (R)ead, (U)pdate, (D)elete. For Collections I use an array of collections so you can have multiple endpoints configured if different collections using the same model. This enables use of for example, Alloy.Collections.locations (for all locations) and Alloy.Collections.locationsByName (for locations by a specific parameter).
 
 (Ideally this should be more elegant, allowing the single locations collection in this case to be used to filter content but I needed a way to make this API independant and it's the best I can do for now!)
 
@@ -347,6 +347,31 @@ RESTe provides a couple of useful helper functions to create new models and coll
 .createCollection(name, array)
 ```
 Each return either a model, or collection that can then be used with Alloy.
+
+When working with created models, you can define an instance of a model that you've specified in the config, and if that supports CRUD functions, you can pass options when creating, saving, updating and deleting.
+
+So for example:
+
+```javascript
+var user = Alloy.Globals.reste.createModel("user");
+
+user.save({
+            username: $.email.value,
+            firstname: $.firstname.value,
+            lastname: $.lastname.value,
+            email: $.email.value,
+            password: $.password.value
+        }, {
+            success: function(e, response) {
+                console.log("User saved!");
+                console.log(user.toJSON());
+            },
+            error: function(e, response) {
+                console.log("Error saving user!");
+                console.log(response); 
+            }
+});
+```
 
 ## License
 
