@@ -340,22 +340,25 @@ var main = function() {
         var model = new Backbone.Model(attributes);
         model._type = name;
 
-        var args = reste.modelConfig[name];
+        if (reste.modelConfig && reste.modelConfig[name]) {
+            var args = reste.modelConfig[name];
 
-        if (args.transform) {
-            var transform = function(model, transform) {
-                if (transform) {
-                    // if we pass a custom transform function, use that
-                    model.__transform = transform(model);
-                } else if (args.transform) {
-                    // otherwise use the config transform
-                    model.__transform = args.transform(model);
-                }
-                return model.__transform;
-            };
+            if (args.transform) {
+                var transform = function(model, transform) {
+                    if (transform) {
+                        // if we pass a custom transform function, use that
+                        model.__transform = transform(model);
+                    } else if (args.transform) {
+                        // otherwise use the config transform
+                        model.__transform = args.transform(model);
+                    }
+                    return model.__transform;
+                };
+            }
+
+            model.transform = transform ? transform : null;
+
         }
-
-        model.transform = transform ? transform : null;
 
         return model;
     };
