@@ -488,8 +488,20 @@ var main = function() {
                     delete params.body.id;
                     delete params.body[modelConfig.id];
 
+                    // change to change the attributes before sending
+                    if (modelConfig.beforeUpdate) {
+                        params.body = modelConfig.beforeUpdate(params.body);
+                    }
+
+                    var onError;
+
+                    options.error ? onError = function(e) {
+                        options.error(e);
+                    } : onError = null;
+
                     reste[modelConfig.update](params, function(e) {
                         // calls error handler if we have it defined and 201 returned
+
                         if (e.code > 200) {
                             if (options.error) {
                                 options.error(e);
@@ -498,7 +510,7 @@ var main = function() {
                             // otherwise pass to success
                             options.success(e);
                         }
-                    });
+                    }, onError);
                 }
 
                 if (method == "read") {
@@ -543,10 +555,20 @@ var main = function() {
                     delete body.id;
                     delete body[modelConfig.id];
 
+                    // change to change the attributes before sending
+                    if (modelConfig.beforeDelete) {
+                        body = modelConfig.beforeDelete(body);
+                    }
+
+                    options.error ? onError = function(e) {
+                        options.error(e);
+                    } : onError = null;
+
                     reste[modelConfig.create]({
                         body: body
                     }, function(e) {
                         // calls error handler if we have it defined and 201+ returned
+
                         if (e.code > 200) {
                             if (options.error) {
                                 options.error(e);
@@ -556,7 +578,7 @@ var main = function() {
                             e.id = e[modelConfig.id];
                             options.success(e);
                         }
-                    });
+                    }, onError);
                 }
 
                 if (method == "delete") {
@@ -564,7 +586,13 @@ var main = function() {
                     body = {};
 
                     body[modelConfig.id] = model.id;
-                    body.body = model;
+                    body.body = model.toJSON();
+
+                    // change to change the attributes before sending
+                    if (modelConfig.beforeCreate) {
+                        body.body = modelConfig.beforeCreate(body.body);
+                    }
+
                     reste[modelConfig.delete](body, function(e) {
                         // calls error handler if we have it defined and 201+ returned
                         if (e.code > 200) {
