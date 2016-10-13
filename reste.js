@@ -470,6 +470,15 @@ var main = function() {
                 if (method == "update") {
                     params = {};
 
+                    // if we're specifying attributes to changes
+                    // just update those
+                    if (options.changes) {
+                        params.body = {};
+                        for (var attr in options.changes) {
+                            params.body[attr] = model.get(attr);
+                        }
+                    }
+
                     // update!
                     params[modelConfig.id] = model.id;
                     params.body = model.toJSON();
