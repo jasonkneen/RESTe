@@ -231,7 +231,6 @@ var main = function() {
             var body,
                 method = "GET",
                 url,
-                onError,
                 deferred;
 
             if (args.post) method = "POST";
