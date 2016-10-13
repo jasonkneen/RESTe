@@ -481,7 +481,8 @@ var main = function() {
 
                     // update!
                     params[modelConfig.id] = model.id;
-                    params.body = model.toJSON();
+
+                    params.body = params.body || model.toJSON();
 
                     // remove any ids from the body
                     delete params.body.id;
