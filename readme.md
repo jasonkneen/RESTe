@@ -123,6 +123,8 @@ You can also pass the **onLoad** and **onError** handlers within each method - t
 
 If you specify parameters required e.g. **videoId** then RESTe will automatically check for these in the parameters passed to the method, and raise an error if they're missing.
 
+Since 1.3.6 it's now possible to have a complete URL in the method definition, for example, if you're using a baseURL and methods for your primary API, you might want to access another service for Push or Geocoding etc. In this instance, you would specify a method and specify the GET, PUT etc as the FULL URL including the http:// intro. RESTe will ignore the baseURL and any global request headers, and use your url entirely -- so add any headers required to the method definition.
+
 Once you've done all this (and assuming no errors), you'll have new methods available:
 
 ```javascript
