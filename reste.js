@@ -89,6 +89,8 @@ var main = function() {
 
         } else {
 
+            http.open(args.method, (config.url ? config.url + args.url : args.url));
+
             // load up any global request headers
             requestHeaders.forEach(function(header) {
                 if (header.name == "Content-Type" && header.value == "application/x-www-form-urlencoded") {
@@ -96,8 +98,6 @@ var main = function() {
                 }
                 http.setRequestHeader(header.name, typeof header.value == "function" ? header.value() : header.value);
             });
-
-            http.open(args.method, (config.url ? config.url + args.url : args.url));
 
         }
 
