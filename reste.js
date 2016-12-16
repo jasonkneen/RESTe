@@ -82,23 +82,29 @@ var main = function() {
             http.setValidatesSecureCertificate(config.validatesSecureCertificate);
         }
 
-        // open the url
-        http.open(args.method, (config.url ? config.url + args.url : args.url));
+        // open the url and check if we're overrding with
+        // a local http based url
+        if (args.url.indexOf("http") >= 0) {
+            http.open(args.method, args.url);
 
-        // load up any global request headers
-        requestHeaders.forEach(function(header) {
-            if (header.name == "Content-Type" && header.value == "application/x-www-form-urlencoded") {
-                formEncode = true;
-            }
+        } else {
 
-            http.setRequestHeader(header.name, typeof header.value == "function" ? header.value() : header.value);
-        });
+            // load up any global request headers
+            requestHeaders.forEach(function(header) {
+                if (header.name == "Content-Type" && header.value == "application/x-www-form-urlencoded") {
+                    formEncode = true;
+                }
+                http.setRequestHeader(header.name, typeof header.value == "function" ? header.value() : header.value);
+            });
+
+            http.open(args.method, (config.url ? config.url + args.url : args.url));
+
+        }
 
         // non-global headers
         if (args.headers) {
             // load up any request headers
             for (var header in args.headers) {
-
                 if (header == "Content-Type" && args.headers[header] == "application/x-www-form-urlencoded") {
                     formEncode = true;
                 } else if (header == "Content-Type" && args.headers[header] == "application/json") {
@@ -110,7 +116,7 @@ var main = function() {
                 if (config.debug) {
                     console.log("::RESTE:: Sending headers");
                     console.log(typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]);
-                }                
+                }
             }
         }
 
@@ -124,7 +130,6 @@ var main = function() {
             } else if (onLoad) {
                 onLoad(response);
             }
-
 
         };
 
@@ -159,7 +164,6 @@ var main = function() {
 
             // go
             if (args.params && (args.method === "POST" || args.method === "PUT")) {
-
                 if (formEncode) {
                     http.send(args.params);
                 } else {
