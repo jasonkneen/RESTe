@@ -224,6 +224,13 @@ var main = function() {
         }
     };
 
+    // removes an item from the requestHeader
+    reste.removeRequestHeaderItem = function(delItem) {
+        requestHeaders = _.filter(requestHeaders, function(item) {
+            return !(item.name == delItem);
+        });
+    }
+    
     // add a new method
     reste.addMethod = function(args) {
         if (config.debug) {
