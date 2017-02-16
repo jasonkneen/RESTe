@@ -38,6 +38,10 @@ var main = function() {
     reste.setUrl = function(url) {
         config.url = url || config.url;
     };
+    
+    reste.getUrl = function() {
+        return config.url;
+    };
 
     // makes an http request to a URL, as a POST / GET / currently,
     // passing params and callback
