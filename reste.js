@@ -167,6 +167,8 @@ var main = function() {
         function send() {
 
             // go
+            log(args.params);
+
             if (args.params && (args.method === "POST" || args.method === "PUT")) {
                 if (formEncode) {
                     http.send(args.params);
@@ -354,27 +356,6 @@ var main = function() {
     reste.createModel = function(name, attributes) {
         var model = new Backbone.Model(attributes);
         model._type = name;
-
-        if (reste.modelConfig && reste.modelConfig[name]) {
-            var args = reste.modelConfig[name];
-
-            if (args.transform) {
-                var transform = function(model, transform) {
-                    if (transform) {
-                        // if we pass a custom transform function, use that
-                        model.__transform = transform(model);
-                    } else if (args.transform) {
-                        // otherwise use the config transform
-                        model.__transform = args.transform(model);
-                    }
-                    return model.__transform;
-                };
-            }
-
-            model.transform = transform ? transform : null;
-
-        }
-
         return model;
     };
 
@@ -401,23 +382,19 @@ var main = function() {
             // storing a reference to the model definition in config
             reste.modelConfig[args.name] = args;
 
-            if (args.transform) {
-                var transform = function(model, transform) {
-                    if (transform) {
-                        // if we pass a custom transform function, use that
-                        model.__transform = transform(model);
-                    } else if (args.transform) {
-                        // otherwise use the config transform
-                        model.__transform = args.transform(model);
-                    }
-                    return model.__transform;
-                };
-            }
-
             var model = Backbone.Model.extend({
                 _type: args.name,
                 _method: args.name,
-                transform: transform ? transform : null
+                transform: function(model, transform) {
+                    if (transform) {
+                        this.__transform = transform(this);
+                    } else if (args.transform) {
+                        this.__transform = args.transform(this);
+                    } else {
+                        this.__transform = this.toJSON()
+                    }
+                    return this.__transform;
+                }
             });
 
             if (args.collections) {
@@ -461,6 +438,7 @@ var main = function() {
                             });
 
                             options.success(response[collectionConfig.content]);
+                            Alloy.Collections[collectionConfig.name].trigger("sync");
                         } else {
                             // otherwise just return an array with the response
                             response.forEach(function(item) {
@@ -468,6 +446,7 @@ var main = function() {
                             });
 
                             options.success(response);
+                            Alloy.Collections[collectionConfig.name].trigger("sync");
                         }
                     }
                 }, function(response) {
