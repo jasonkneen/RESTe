@@ -75,7 +75,7 @@ var main = function() {
         var http = Ti.Network.createHTTPClient();
 
         reste.clearCookies = function() {
-            http && http.clearCookies(config.url);
+            if (http) http.clearCookies(config.url);
         };
 
         var formEncode = false;
