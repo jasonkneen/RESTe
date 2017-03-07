@@ -151,7 +151,7 @@ var main = function() {
                 onError(parseJSON(http.responseText), retry);
 
                 // if the local error returns, we get here
-                config.onError && config.onError(parseJSON(http.responseText), retry);
+                if (config.onError) config.onError(parseJSON(http.responseText), retry);
 
             } else if (config.onError) {
                 // otherwise fallback to the one specified in config
