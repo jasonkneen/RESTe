@@ -119,8 +119,8 @@ var main = function() {
                 http.setRequestHeader(header, typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]);
 
                 if (config.debug) {
-                    console.log("::RESTE:: Sending headers");
-                    console.log(typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]);
+                    log("::RESTE:: setting local header");
+                    log(header + ":" + (typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]));
                 }
             }
         }
