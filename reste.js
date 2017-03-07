@@ -38,7 +38,7 @@ var main = function() {
     reste.setUrl = function(url) {
         config.url = url || config.url;
     };
-    
+
     reste.getUrl = function() {
         return config.url;
     };
@@ -71,6 +71,7 @@ var main = function() {
             log("::RESTE:: " + JSON.stringify(args.params));
         }
 
+
         // create a client
         var http = Ti.Network.createHTTPClient();
 
@@ -91,20 +92,17 @@ var main = function() {
         // a local http based url
         if (args.url.indexOf("http") >= 0) {
             http.open(args.method, args.url);
-
         } else {
-
             http.open(args.method, (config.url ? config.url + args.url : args.url));
-
-            // load up any global request headers
-            requestHeaders.forEach(function(header) {
-                if (header.name == "Content-Type" && header.value == "application/x-www-form-urlencoded") {
-                    formEncode = true;
-                }
-                http.setRequestHeader(header.name, typeof header.value == "function" ? header.value() : header.value);
-            });
-
         }
+
+        // load up any global request headers
+        requestHeaders.forEach(function(header) {
+            if (header.name == "Content-Type" && header.value == "application/x-www-form-urlencoded") {
+                formEncode = true;
+            }
+            http.setRequestHeader(header.name, typeof header.value == "function" ? header.value() : header.value);
+        });
 
         // non-global headers
         if (args.headers) {
