@@ -82,6 +82,7 @@ var main = function() {
 
         //set some defaults
         http.setTimeout(config.timeout || 10000);
+
         if (_.has(config, 'validatesSecureCertificate')) {
             http.setValidatesSecureCertificate(config.validatesSecureCertificate);
         }
@@ -235,8 +236,8 @@ var main = function() {
         requestHeaders = _.filter(requestHeaders, function(item) {
             return !(item.name == delItem);
         });
-    }
-    
+    };
+
     // add a new method
     reste.addMethod = function(args) {
         if (config.debug) {
