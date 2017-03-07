@@ -93,7 +93,6 @@ var main = function() {
             http.open(args.method, args.url);
 
         } else {
-
             http.open(args.method, (config.url ? config.url + args.url : args.url));
 
             // load up any global request headers
@@ -102,8 +101,12 @@ var main = function() {
                     formEncode = true;
                 }
                 http.setRequestHeader(header.name, typeof header.value == "function" ? header.value() : header.value);
-            });
 
+                if (config.debug) {
+                    console.log("::RESTE:: Sending request headers");
+                    console.log(typeof header == "function" ? header() : header);
+                }
+            });
         }
 
         // non-global headers
