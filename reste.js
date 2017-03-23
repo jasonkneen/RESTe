@@ -397,7 +397,6 @@ var main = function() {
             });
 
             if (args.collections) {
-
                 args.collections.forEach(function(collection) {
                     Alloy.Collections[collection.name] = Alloy.Collections[collection.name] || new Backbone.Collection();
                     Alloy.Collections[collection.name]._type = args.name;
