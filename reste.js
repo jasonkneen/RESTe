@@ -65,7 +65,12 @@ var main = function() {
         }
 
         // debug the url
-        log("::RESTE:: " + (config.url ? config.url + args.url : args.url));
+        if (args.url.indexOf("http") >= 0) {
+            http.open(args.method, );
+            log("::RESTE:: " + args.url);
+        } else {
+            log("::RESTE:: " + (config.url ? config.url + args.url : args.url));
+        }
 
         if (args.params) {
             log("::RESTE:: " + JSON.stringify(args.params));
@@ -101,7 +106,13 @@ var main = function() {
             if (header.name == "Content-Type" && header.value == "application/x-www-form-urlencoded") {
                 formEncode = true;
             }
+
             http.setRequestHeader(header.name, typeof header.value == "function" ? header.value() : header.value);
+
+            if (config.debug) {
+                log("::RESTE:: Setting global header");
+                log(header.name + ":" + (typeof header.value == "function" ? header.value() : header.value));
+            }
         });
 
         // non-global headers
@@ -117,7 +128,7 @@ var main = function() {
                 http.setRequestHeader(header, typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]);
 
                 if (config.debug) {
-                    log("::RESTE:: setting local header");
+                    log("::RESTE:: Setting local header");
                     log(header + ":" + (typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]));
                 }
             }
