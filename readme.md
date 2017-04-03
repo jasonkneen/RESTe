@@ -154,17 +154,17 @@ api.addVideo({
 });
 ```
 
-Here's a PUT request example, passing an id (you'd need to ensure you have a <objectId> attribute in the method definition:
+Here's a **PUT** request example, passing an id (you'd need to ensure you have a `objectId` attribute in the method definition:
 
 ```javascript
 api.updateVideo({
 	objectId: "123",
-    body: {
-        categoryId: 2,
-        name: "My Video2"
-    }
+	body: {
+		categoryId: 2,
+		name: "My Video2"
+	}
 }, function(video) {
-    // do stuff with the video
+	// do stuff with the video
 });
 ```
 
@@ -176,7 +176,7 @@ Those apply when you decide to set those at a method definition level (for one e
 
 You can also pass the **onLoad** and **onError** handlers within each method - to have a unique response from each. In all cases you always get two params which are the **response** and the **original callback** so you can pass it through, or stop the call. Again with **onError** you can perform a **retry()** at a local level.
 
-### Override the base URL
+### Override the base URL
 
 Since version 1.3.6 it's now possible to have a complete URL in the method definition, for example, if you're using a base URL (`url` top setting) and methods for your primary API, you might want to access another service for Push or Geocoding etc.
 
@@ -195,7 +195,7 @@ api.config({
 
 ### Override or add request headers
 
-You can use override or add new headers for each method (or endpoint) locally.
+You can override or add new headers for each method (or endpoint) locally.
 
 You can also use functions for those which will be executed every time this method is used from RESTe, giving you the ability to have dynamic parameters here. Pretty useful for `Authorization` headers using dynamic tokens persisted somewhere else for example.
 
