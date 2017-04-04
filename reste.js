@@ -95,6 +95,7 @@ var main = function() {
 
         // open the url and check if we're overrding with
         // a local http based url
+
         if (args.url.indexOf("http") >= 0) {
             http.open(args.method, args.url);
         } else {
@@ -365,6 +366,29 @@ var main = function() {
 
     reste.createModel = function(name, attributes) {
         var model = new Backbone.Model(attributes);
+
+        // if we have a config based transfor for th emodel
+        // then attach this to the model, or create a default
+        if (reste.modelConfig && reste.modelConfig[name].transform) {
+            model.transform = function(model, transform) {
+                if (transform) {
+                    this.__transform = transform(this);
+                } else {
+                    this.__transform = reste.modelConfig[name].transform(this);
+                }
+                return this.__transform;
+            };
+        } else {
+            model.transform = function(model, transform) {
+                if (transform) {
+                    this.__transform = transform(this);
+                } else {
+                    this.__transform = this.toJSON();
+                }
+                return this.__transform;
+            };
+        }
+
         model._type = name;
         return model;
     };
@@ -401,7 +425,7 @@ var main = function() {
                     } else if (args.transform) {
                         this.__transform = args.transform(this);
                     } else {
-                        this.__transform = this.toJSON()
+                        this.__transform = this.toJSON();
                     }
                     return this.__transform;
                 }
