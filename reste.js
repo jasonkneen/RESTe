@@ -155,13 +155,14 @@ var main = function() {
                 makeHttpRequest(args, onLoad, onError);
             }
 
+            // if we have an onError method, use it
             if (onError) {
-                // if we have an onError method, use it
-                onError(parseJSON(http.responseText), retry);
-
-                // if the local error returns, we get here
-                if (config.onError) config.onError(parseJSON(http.responseText), retry);
-
+                // if we have a global onError, we'll pass it on too do we can still use it locally if we want to
+                if (config.onError) {
+                    onError(parseJSON(http.responseText), retry, config.onError);
+                } else {
+                    onError(parseJSON(http.responseText), retry);
+                }
             } else if (config.onError) {
                 // otherwise fallback to the one specified in config
                 config.onError(parseJSON(http.responseText), retry);
