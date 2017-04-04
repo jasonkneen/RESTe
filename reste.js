@@ -66,7 +66,6 @@ var main = function() {
 
         // debug the url
         if (args.url.indexOf("http") >= 0) {
-            http.open(args.method, );
             log("::RESTE:: " + args.url);
         } else {
             log("::RESTE:: " + (config.url ? config.url + args.url : args.url));
