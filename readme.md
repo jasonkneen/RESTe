@@ -84,7 +84,7 @@ api.config({
     methods: [{
         name: "courses",
         post: "functions/getCourses",
-        onError: function(e, callback){
+        onError: function(e, callback, globalOnError){
         	alert("There was an error getting the courses!");
         }
     }, {
@@ -120,6 +120,38 @@ api.config({
 You can pass the _optional_ **onError** and **onLoad** handlers, which will intercept the error or retrieved data before it's passed to the calling function's callback. This way you can change, test, do-what-you-want-with-it before passing it on.
 
 Note, in the **onError** handler, you can (as of 1.2.0) also handle any network errors better -- in the example above a **retry** method is returned so you can check the error, display a specific one, or handle any network issues, and if required, issue a **retry()** which will attempt the last call again.
+
+If you've defined a **global onError()** within the configuration, it will passed onto any local `onError()` function defined for you methods. This way you can have something like:
+
+```javascript
+     methods: [{
+        name: "courses",
+        post: "functions/getCourses",
+        onError: function(e, callback, globalOnError) {
+		if (e.message) {
+			alert(e.message);
+		} else {
+			globalOnError();
+		}
+        }
+    }, {
+        ...
+    }],
+    onError: function(e, retry) {
+        var dialog = Ti.UI.createAlertDialog({
+            title: "Connection error",
+            message: "There was an error connecting to the server, check your network connection and  retry.",
+            buttonNames: ['Retry']
+        });
+
+        dialog.addEventListener("click", function() {
+            retry();
+        });
+        dialog.show();
+    },
+```
+
+If there is an error message within the response, you'll display it within an `alert()`, otherwise the normal global `onError()` handler will be used.
 
 If you specify parameters required e.g. **videoId** then RESTe will automatically check for these in the parameters passed to the method, and raise an error if they're missing.
 
