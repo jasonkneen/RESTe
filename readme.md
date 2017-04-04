@@ -2,13 +2,13 @@
 
 ## Important note
 
-RESTe tries to make sense of the data that comes back but currently it will have problems with invalid JSON data. If you're having any issues with data not being rendered / bound, check it's valid JSON so everything is wrapped as a string. JSON has real issues with numbers -- if it's a normal number it's fine but putting in say 000000 for a property can cause issues in parsing. 
+RESTe tries to make sense of the data that comes back but currently it will have problems with invalid JSON data. If you're having any issues with data not being rendered / bound, check it's valid JSON so everything is wrapped as a string. JSON has real issues with numbers -- if it's a normal number it's fine but putting in say 000000 for a property can cause issues in parsing.
 
 ## Why?
 
 I build a lot of apps that integrate with APIs. These could be written using the open-source Parse Server or a hosted service, but more often they are custom APIs written by another developer. I used to use a basic api.js library to handle the API integration, but this typically involved writing my own module for the API in question, requiring the api.js module, and writing specific methods for the app.
 
-### The Old Way 
+### The Old Way
 
 So previously I'd end up writing methods like this:
 
@@ -37,7 +37,7 @@ exports.updateUser = function(name, email, password, callback) {
         "password" : password
 
     }), function(e) {
-       
+
         processResponse(e, function() {
             callback(e);
         });
@@ -58,6 +58,7 @@ The main things I wanted to achieve were:-
 * Minimal code
 
 ## Quick Start
+
 * [Install from NPM the latest version](https://www.npmjs.com/package/reste)
 or
 * [Download the latest version](https://github.com/jasonkneen/reste) and place in your project (lib folder for Alloy).
@@ -69,7 +70,6 @@ var reste = require("reste");
 var api = new reste();
 
 // now we can do our one-time configure
-
 api.config({
     debug: true, // allows logging to console of ::REST:: messages
     autoValidateParams: false, // set to true to throw errors if <param> url properties are not passed
@@ -115,15 +115,13 @@ api.config({
 });
 ```
 
+### onError() and onLoad()
+
 You can pass the _optional_ **onError** and **onLoad** handlers, which will intercept the error or retrieved data before it's passed to the calling function's callback. This way you can change, test, do-what-you-want-with-it before passing it on.
 
 Note, in the **onError** handler, you can (as of 1.2.0) also handle any network errors better -- in the example above a **retry** method is returned so you can check the error, display a specific one, or handle any network issues, and if required, issue a **retry()** which will attempt the last call again.
 
-You can also pass the **onLoad** and **onError** handlers within each method - to have a unique response from each. In all cases you always get two params which are the **response** and the **original callback** so you can pass it through, or stop the call. Again with **onError** you can perform a **retry()** at a local level.
-
 If you specify parameters required e.g. **videoId** then RESTe will automatically check for these in the parameters passed to the method, and raise an error if they're missing.
-
-Since 1.3.6 it's now possible to have a complete URL in the method definition, for example, if you're using a baseURL and methods for your primary API, you might want to access another service for Push or Geocoding etc. In this instance, you would specify a method and specify the GET, PUT etc as the FULL URL including the http:// intro. RESTe will ignore the baseURL and any global request headers, and use your url entirely -- so add any headers required to the method definition.
 
 Once you've done all this (and assuming no errors), you'll have new methods available:
 
@@ -156,20 +154,80 @@ api.addVideo({
 });
 ```
 
-Here's a PUT request example, passing an id (you'd need to ensure you have a <objectId> attribute in the method definition:
+Here's a **PUT** request example, passing an id (you'd need to ensure you have a `objectId` attribute in the method definition:
 
 ```javascript
 api.updateVideo({
 	objectId: "123",
-    body: {
-        categoryId: 2,
-        name: "My Video2"
-    }
+	body: {
+		categoryId: 2,
+		name: "My Video2"
+	}
 }, function(video) {
-    // do stuff with the video
+	// do stuff with the video
 });
 ```
+
+## Local definitions
+
+Those apply when you decide to set those at a method definition level (for one endpoint only).
+
+### onError() and onLoad()
+
+You can also pass the **onLoad** and **onError** handlers within each method - to have a unique response from each. In all cases you always get two params which are the **response** and the **original callback** so you can pass it through, or stop the call. Again with **onError** you can perform a **retry()** at a local level.
+
+### Override the base URL
+
+Since version 1.3.6 it's now possible to have a complete URL in the method definition, for example, if you're using a base URL (`url` top setting) and methods for your primary API, you might want to access another service for Push or Geocoding etc.
+
+In this instance, you would specify a method and specify the **GET**, **PUT** etc as the full URL including the `http://` or `https://` intro. RESTe will ignore the base URL and any global request headers, and use your "local" URL entirely -- so add any headers required to the method definition.
+
+```javascript
+api.config({
+    ...
+    }, {
+        name: "pushNotification",
+        post: "http://another.api.service.com/push"
+    }, {
+    ...
+});
+```
+
+### Override or add request headers
+
+You can override or add new headers for each method (or endpoint) locally.
+
+You can also use functions for those which will be executed every time this method is used from RESTe, giving you the ability to have dynamic parameters here. Pretty useful for `Authorization` headers using dynamic tokens persisted somewhere else for example.
+
+```javascript
+...
+{
+    name: "getAccounts",
+    get: "user/accounts",
+    headers: {
+        "Authorization": function(){
+            return "Something";
+        }
+    }
+}
+...
+```
+
+**Pro tip:** If for whatever reason you need some settings to be more dynamic (maybe using global functions), you can even have self executed functions for any of those. Something like :
+
+```javascript
+api.config({
+    ...
+    }, {
+        name: "pushNotification",
+        post: (function(){ return "some/endpoint"; })()
+    }, {
+    ...
+});
+```
+
 ## Promise support with q.js
+
 [Download the q.js](https://github.com/kriskowal/q) and place in your project (lib folder for Alloy). Then pass it to config as Q property.
 
 ```javascript
@@ -184,11 +242,12 @@ Examples using Promise
 ```javascript
 api.getVideos().then(function(videos){}).then(...).catch(...);
 ```
+
 Or call a method with a specific Id:
 
 ```javascript
 api.getVideoById({
-    videoId: "fUAM4ZFj9X" 
+    videoId: "fUAM4ZFj9X"
 }).then(function(video) {
     // do stuff with the video
 });
@@ -216,12 +275,12 @@ api.clearCookies();
 
 RESTe supports collection and model generation. So it supports creating and managing collections and models, binding, and CRUD methods to Create, Update and Delete models.
 
-You can also now perform transform functions at a global (config) level or locally in a controller / view -- this is really useful if you use Alloy and pass models to views using **$model** 
+You can also now perform transform functions at a global (config) level or locally in a controller / view -- this is really useful if you use Alloy and pass models to views using **$model**
 
 In the following example, we've defined a method called **getExpenseQueueFull** elsewhere in the config that gets expense details, and then defined a **transform** function in the config:
 
 ```javascript
-models: [{
+    models: [{
         name: "expense",
         id: "unid",
         read: "getExpenseById",
@@ -241,6 +300,7 @@ models: [{
         }],
     }
 ```
+
 So now whenever you want to transform the model, you can do so within a local transform function as follows:
 
 ```javascript
@@ -259,7 +319,7 @@ Using the following config you can configure end points that will still work as 
 (Ideally this should be more elegant, allowing the single locations collection in this case to be used to filter content but I needed a way to make this API independant and it's the best I can do for now!)
 
 ```javascript
-models: [{
+    models: [{
         name: "location",
         id: "objectId",
         read: "getLocation",
@@ -277,7 +337,7 @@ models: [{
             read: "getLocationsByName"
         }],
     }],
-methods: [{
+    methods: [{
         name: "getLocations",
         get: "classes/locations"
     }, {
@@ -302,23 +362,24 @@ methods: [{
 
 In the example above, I can refresh the data for a collection by using:
 
-```javascript 
+```javascript
 Alloy.Collections.locations.fetch();
 ```
+
 and bind it to a tableview as follows:
 
 ```xml
 <TableView dataCollection="locations" onClick="selectLocation">
-                <TableViewRow id="locationRow" model="{objectId}" >
-                    <Label class="title" top="10"left="20" text="{name}"/>
-                    <Label class="subTitle" bottom="10" left="20" text="{address}"/>
-                </TableViewRow>
+    <TableViewRow id="locationRow" model="{objectId}" >
+        <Label class="title" top="10"left="20" text="{name}"/>
+        <Label class="subTitle" bottom="10" left="20" text="{address}"/>
+    </TableViewRow>
  </TableView>
 ```
 
 You could also send parameters like follows:
 
-```javascript 
+```javascript
 Alloy.Collections.locationsByName.fetch({
 					name: "home"
 					});
@@ -326,7 +387,7 @@ Alloy.Collections.locationsByName.fetch({
 
 To sort a collection, you need to set the comparator to the collection. Don't do this in the API configuration, but on the collection itself before you fetch it, like shown in the example below.
 
-Calling the sort function at any time after the fetch will try to sort. 
+Calling the sort function at any time after the fetch will try to sort.
 
 ```js
 Alloy.Collections.locations.comparator = function(a, b){
@@ -370,7 +431,7 @@ user.save({
             },
             error: function(e, response) {
                 console.log("Error saving user!");
-                console.log(response); 
+                console.log(response);
             }
 });
 ```
