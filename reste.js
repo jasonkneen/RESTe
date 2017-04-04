@@ -368,7 +368,8 @@ var main = function() {
 
         // if we have a config based transfor for th emodel
         // then attach this to the model, or create a default
-        if (reste.modelConfig && reste.modelConfig[name].transform) {
+        if (reste.modelConfig && reste.modelConfig[name] && reste.modelConfig[name].transform) {
+            alert("here")
             model.transform = function(model, transform) {
                 if (transform) {
                     this.__transform = transform(this);
