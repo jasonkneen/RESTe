@@ -65,7 +65,7 @@ The main things I wanted to achieve were:-
 or
 * [Download the latest version](https://github.com/jasonkneen/reste) and place in your project (lib folder for Alloy).
 
-Wherever you want to initialise the API interface, put this (ideally this should go in your alloy.js or index.js file):-
+Wherever you want to initialise the API interface, put this (ideally this should go in your alloy.js directly or create a config file in the app/lib folder and require from alloy.js):-
 
 ```javascript
 var reste = require("reste");
@@ -116,6 +116,8 @@ api.config({
     }
 });
 ```
+
+**NOTE:** You can't put the config in the same file as one that is using any bindings to the models/collections define *in* the config. This is because Alloy will attempt to resolve any references for **dataCollection** before the config is ready -- so for best results put the config into alloy.js directly OR as a require to a config file in the app/lib folder. 
 
 ### onError() and onLoad()
 
