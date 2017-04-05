@@ -307,6 +307,8 @@ api.clearCookies();
 
 RESTe supports collection and model generation. So it supports creating and managing collections and models, binding, and CRUD methods to Create, Update and Delete models.
 
+**NOTE**: If you are using the Alloy Collections and Model Support of RESTe, you should **not** use the Alloy Model / Collection definitions -- so you shouldn't have an app/models folder with models defined. You must also **not** use the <Collection src="etc"/> notation in the XML -- you *just* use the dataCollection binding in a repeater.
+
 You can also now perform transform functions at a global (config) level or locally in a controller / view -- this is really useful if you use Alloy and pass models to views using **$model**
 
 In the following example, we've defined a method called **getExpenseQueueFull** elsewhere in the config that gets expense details, and then defined a **transform** function in the config:
