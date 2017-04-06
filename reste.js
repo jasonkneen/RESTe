@@ -160,20 +160,30 @@ var main = function() {
                 makeHttpRequest(args, onLoad, onError);
             }
 
+            var error;
+
+            if (config.errorsAsObjects){
+                error = e;
+                warn("RESTE:: Errors will be returned as objects.");
+            } else {
+                error = parseJSON(http.responseText);
+                warn("RESTE:: Future versions of RESTe will return errors as objects. Use config.errorsAsObjects = true to support this now and update your apps!");
+            }
+
             // if we have an onError method, use it
             if (onError) {
                 // if we have a global onError, we'll pass it on too do we can still use it locally if we want to
                 if (config.onError) {
-                    onError(parseJSON(http.responseText), retry, config.onError);
+                    onError(error, retry, config.onError);
                 } else {
-                    onError(parseJSON(http.responseText), retry);
+                    onError(error, retry);
                 }
             } else if (config.onError) {
                 // otherwise fallback to the one specified in config
-                config.onError(parseJSON(http.responseText), retry);
+                config.onError(error, retry);
             } else if (onLoad) {
                 // otherwise revert to the onLoad callback
-                onLoad(parseJSON(http.responseText), retry);
+                onLoad(error, retry);
             } else {
                 // and if reste's not specified, error!
                 throw "RESTe :: No error handler / callback for: " + args.url;
