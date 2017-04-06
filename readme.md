@@ -1,6 +1,15 @@
 # RESTe
 
-## Important note
+## FUTURE BREAKING CHANGE
+
+In 1.4.5, a new option to support error objects is available. It's off by default and can be switched on by setting: 
+
+```JS
+.errorsAsObjects = true
+```
+in the RESTe config. This will ensure you get full objects back for errors so you can access status codes, the http object itself. For legacy support this is off by default but will be the default in future versions so please, update your apps!
+
+## Important note on JSON data
 
 RESTe tries to make sense of the data that comes back but currently it will have problems with invalid JSON data. If you're having any issues with data not being rendered / bound, check it's valid JSON so everything is wrapped as a string. JSON has real issues with numbers -- if it's a normal number it's fine but putting in say 000000 for a property can cause issues in parsing.
 
@@ -74,6 +83,7 @@ var api = new reste();
 // now we can do our one-time configure
 api.config({
     debug: true, // allows logging to console of ::REST:: messages
+    errorsAsObjects: true, // new in 1.4.5, will break 1.4.4 apps that handle errors
     autoValidateParams: false, // set to true to throw errors if <param> url properties are not passed
     validatesSecureCertificate: false, // Optional: If not specified, default behaviour from http://goo.gl/sJvxzS is kept.
     timeout: 4000,
