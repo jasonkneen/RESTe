@@ -13,6 +13,11 @@ var main = function() {
         }
     }
 
+    // generic log handler in DEV mode
+    function warn(message) {
+            console.warn(message);
+    }
+
     // sets up the config, headers, adds methods
     reste.config = function(args) {
 
