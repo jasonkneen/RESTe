@@ -83,7 +83,7 @@ var api = new reste();
 // now we can do our one-time configure
 api.config({
     debug: true, // allows logging to console of ::REST:: messages
-    errorsAsObjects: true, // new in 1.4.5, will break 1.4.4 apps that handle errors
+    errorsAsObjects: true, // Default: false. New in 1.4.5, will break 1.4.4 apps that handle errors
     autoValidateParams: false, // set to true to throw errors if <param> url properties are not passed
     validatesSecureCertificate: false, // Optional: If not specified, default behaviour from http://goo.gl/sJvxzS is kept.
     timeout: 4000,
@@ -128,6 +128,42 @@ api.config({
 ```
 
 **NOTE:** You can't put the config in the same file as one that is using any bindings to the models/collections define *in* the config. This is because Alloy will attempt to resolve any references for **dataCollection** before the config is ready -- so for best results put the config into alloy.js directly OR as a require to a config file in the app/lib folder. 
+
+### Errors
+
+By default RESTe returns the body of the reponse from the API when an error occurs using `responseText` from the HTTP Client.
+
+Example of the object returned by default:
+```javascript
+{
+    "success": false,
+    "code": 401,
+    "source": "[object TiNetworkHTTPClient]",
+    "type": "error",
+    "error": "HTTP error",
+    "url": "http://lorem.ipsum.com"
+}
+```
+
+You can change this by specifying `errorsAsObjects: true` within your RESTe config so you get the full error object back. This will include the error object as well as the body response from the API which will be accessible from the `content` property on the object returned.
+
+Example of a the object returned including the error and the response body:
+```javascript
+{
+    "success": false,
+    "code": 401,
+    "content": {
+        "error": "invalid_credentials",
+        "message": "The user credentials were incorrect."
+    },
+    "source": "[object TiNetworkHTTPClient]",
+    "type": "error",
+    "error": "HTTP error",
+    "url": "http://lorem.ipsum.com"
+}
+```
+
+This is really convenient if you need to access both the HTTP status code as well as the potential error message returned from the API.
 
 ### onError() and onLoad()
 
