@@ -75,6 +75,7 @@ api.config({
     autoValidateParams: false, // set to true to throw errors if <param> url properties are not passed
     validatesSecureCertificate: false, // Optional: If not specified, default behaviour from http://goo.gl/sJvxzS is kept.
     timeout: 4000,
+    errorsAsObjects: true, // Default: false.
     url: "https://api.parse.com/1/",
     requestHeaders: {
         "X-Parse-Application-Id": "APPID",
@@ -114,6 +115,42 @@ api.config({
     }
 });
 ```
+
+### Errors
+
+By default RESTe returns the body of the reponse from the API when an error occurs using `responseText` from the HTTP Client.
+
+Example of the object returned by default:
+```javascript
+{
+    "success": false,
+    "code": 401,
+    "source": "[object TiNetworkHTTPClient]",
+    "type": "error",
+    "error": "HTTP error",
+    "url": "http://lorem.ipsum.com"
+}
+```
+
+You can change this by specifying `errorsAsObjects: true` within your RESTe config so you get the full error object back. This will include the error object as well as the body response from the API which will be accessible from the `content` property on the object returned.
+
+Example of a the object returned including the error and the response body:
+```javascript
+{
+    "success": false,
+    "code": 401,
+    "content": {
+        "error": "invalid_credentials",
+        "message": "The user credentials were incorrect."
+    },
+    "source": "[object TiNetworkHTTPClient]",
+    "type": "error",
+    "error": "HTTP error",
+    "url": "http://lorem.ipsum.com"
+}
+```
+
+This is really convenient if you need to access both the HTTP status code as well as the potential error message returned from the API.
 
 ### onError() and onLoad()
 
