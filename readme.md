@@ -1,8 +1,19 @@
 # RESTe
 
-## Important note
+## FUTURE BREAKING CHANGE
+
+In 1.4.5, a new option to support error objects is available. It's off by default and can be switched on by setting: 
+
+```JS
+.errorsAsObjects = true
+```
+in the RESTe config. This will ensure you get full objects back for errors so you can access status codes, the http object itself. For legacy support this is off by default but will be the default in future versions so please, update your apps!
+
+## Important note on JSON data
 
 RESTe tries to make sense of the data that comes back but currently it will have problems with invalid JSON data. If you're having any issues with data not being rendered / bound, check it's valid JSON so everything is wrapped as a string. JSON has real issues with numbers -- if it's a normal number it's fine but putting in say 000000 for a property can cause issues in parsing.
+
+Also, make sure you're not using the **app/models** folder or the **<Collection / Model src="etc"/>** tags -- you *only* need to define your models in the RESTe config, and then use the **dataCollection** property in the repeater.
 
 ## Why?
 
@@ -63,7 +74,7 @@ The main things I wanted to achieve were:-
 or
 * [Download the latest version](https://github.com/jasonkneen/reste) and place in your project (lib folder for Alloy).
 
-Wherever you want to initialise the API interface, put this (ideally this should go in your alloy.js or index.js file):-
+Wherever you want to initialise the API interface, put this (ideally this should go in your alloy.js directly or create a config file in the app/lib folder and require from alloy.js):-
 
 ```javascript
 var reste = require("reste");
@@ -72,10 +83,10 @@ var api = new reste();
 // now we can do our one-time configure
 api.config({
     debug: true, // allows logging to console of ::REST:: messages
+    errorsAsObjects: true, // Default: false. New in 1.4.5, will break 1.4.4 apps that handle errors
     autoValidateParams: false, // set to true to throw errors if <param> url properties are not passed
     validatesSecureCertificate: false, // Optional: If not specified, default behaviour from http://goo.gl/sJvxzS is kept.
     timeout: 4000,
-    errorsAsObjects: true, // Default: false.
     url: "https://api.parse.com/1/",
     requestHeaders: {
         "X-Parse-Application-Id": "APPID",
@@ -115,6 +126,8 @@ api.config({
     }
 });
 ```
+
+**NOTE:** You can't put the config in the same file as one that is using any bindings to the models/collections define *in* the config. This is because Alloy will attempt to resolve any references for **dataCollection** before the config is ready -- so for best results put the config into alloy.js directly OR as a require to a config file in the app/lib folder. 
 
 ### Errors
 
@@ -343,6 +356,8 @@ api.clearCookies();
 ## Alloy Collections and Model support
 
 RESTe supports collection and model generation. So it supports creating and managing collections and models, binding, and CRUD methods to Create, Update and Delete models.
+
+**NOTE**: If you are using the Alloy Collections and Model Support of RESTe, you should **not** use the Alloy Model / Collection definitions -- so you shouldn't have an app/models folder with models defined. You must also **not** use the <Collection src="etc"/> notation in the XML -- you *just* use the dataCollection binding in a repeater.
 
 You can also now perform transform functions at a global (config) level or locally in a controller / view -- this is really useful if you use Alloy and pass models to views using **$model**
 
