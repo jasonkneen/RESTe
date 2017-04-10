@@ -13,6 +13,11 @@ var main = function() {
         }
     }
 
+    // generic log handler in DEV mode
+    function warn(message) {
+            console.warn(message);
+    }
+
     // sets up the config, headers, adds methods
     reste.config = function(args) {
 
@@ -66,7 +71,6 @@ var main = function() {
 
         // debug the url
         if (args.url.indexOf("http") >= 0) {
-            http.open(args.method, );
             log("::RESTE:: " + args.url);
         } else {
             log("::RESTE:: " + (config.url ? config.url + args.url : args.url));
@@ -95,6 +99,7 @@ var main = function() {
 
         // open the url and check if we're overrding with
         // a local http based url
+
         if (args.url.indexOf("http") >= 0) {
             http.open(args.method, args.url);
         } else {
@@ -155,20 +160,30 @@ var main = function() {
                 makeHttpRequest(args, onLoad, onError);
             }
 
+            var error;
+
+            if (config.errorsAsObjects){
+                error = e;
+                warn("RESTE:: Errors will be returned as objects.");
+            } else {
+                error = parseJSON(http.responseText);
+                warn("RESTE:: Future versions of RESTe will return errors as objects. Use config.errorsAsObjects = true to support this now and update your apps!");
+            }
+
             // if we have an onError method, use it
             if (onError) {
                 // if we have a global onError, we'll pass it on too do we can still use it locally if we want to
                 if (config.onError) {
-                    onError(parseJSON(http.responseText), retry, config.onError);
+                    onError(error, retry, config.onError);
                 } else {
-                    onError(parseJSON(http.responseText), retry);
+                    onError(error, retry);
                 }
             } else if (config.onError) {
                 // otherwise fallback to the one specified in config
-                config.onError(parseJSON(http.responseText), retry);
+                config.onError(error, retry);
             } else if (onLoad) {
                 // otherwise revert to the onLoad callback
-                onLoad(parseJSON(http.responseText), retry);
+                onLoad(error, retry);
             } else {
                 // and if reste's not specified, error!
                 throw "RESTe :: No error handler / callback for: " + args.url;
@@ -366,6 +381,30 @@ var main = function() {
 
     reste.createModel = function(name, attributes) {
         var model = new Backbone.Model(attributes);
+
+        // if we have a config based transfor for th emodel
+        // then attach this to the model, or create a default
+        if (reste.modelConfig && reste.modelConfig[name] && reste.modelConfig[name].transform) {
+            alert("here")
+            model.transform = function(model, transform) {
+                if (transform) {
+                    this.__transform = transform(this);
+                } else {
+                    this.__transform = reste.modelConfig[name].transform(this);
+                }
+                return this.__transform;
+            };
+        } else {
+            model.transform = function(model, transform) {
+                if (transform) {
+                    this.__transform = transform(this);
+                } else {
+                    this.__transform = this.toJSON();
+                }
+                return this.__transform;
+            };
+        }
+
         model._type = name;
         return model;
     };
@@ -402,7 +441,7 @@ var main = function() {
                     } else if (args.transform) {
                         this.__transform = args.transform(this);
                     } else {
-                        this.__transform = this.toJSON()
+                        this.__transform = this.toJSON();
                     }
                     return this.__transform;
                 }
