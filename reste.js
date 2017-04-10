@@ -115,8 +115,7 @@ var main = function() {
             http.setRequestHeader(header.name, typeof header.value == "function" ? header.value() : header.value);
 
             if (config.debug) {
-                log("::RESTE:: Setting global header");
-                log(header.name + ":" + (typeof header.value == "function" ? header.value() : header.value));
+                log("::RESTE:: Setting global header - " + header.name + ": " + (typeof header.value == "function" ? header.value() : header.value));
             }
         });
 
@@ -133,8 +132,7 @@ var main = function() {
                 http.setRequestHeader(header, typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]);
 
                 if (config.debug) {
-                    log("::RESTE:: Setting local header");
-                    log(header + ":" + (typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]));
+                    log("::RESTE:: Setting local header - " + header + ": " + (typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]));
                 }
             }
         }
@@ -164,6 +162,7 @@ var main = function() {
 
             if (config.errorsAsObjects){
                 error = e;
+                error['content'] = parseJSON(http.responseText);
                 warn("RESTE:: Errors will be returned as objects.");
             } else {
                 error = parseJSON(http.responseText);
