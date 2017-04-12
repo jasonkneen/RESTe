@@ -543,6 +543,11 @@ var main = function() {
                             options[modelConfig.id] = model.id;
                         }
 
+                        var onError;
+                        options.error ? onError = function(e) {
+                            options.error(e);
+                        } : onError = null;
+
                         reste[modelConfig.read](options, function(e) {
 
                             if (modelConfig.content) {
@@ -563,7 +568,7 @@ var main = function() {
                                     options.success(e);
                                 }
                             }
-                        });
+                        }, onError);
                     }
                 }
 
@@ -580,6 +585,7 @@ var main = function() {
                         body = modelConfig.beforeDelete(body);
                     }
 
+                    var onError;
                     options.error ? onError = function(e) {
                         options.error(e);
                     } : onError = null;
@@ -613,6 +619,11 @@ var main = function() {
                         body.body = modelConfig.beforeCreate(body.body);
                     }
 
+                    var onError;
+                    options.error ? onError = function(e) {
+                        options.error(e);
+                    } : onError = null;
+
                     reste[modelConfig.delete](body, function(e) {
                         // calls error handler if we have it defined and 201+ returned
                         if (e.code > 200) {
@@ -623,7 +634,7 @@ var main = function() {
                             // otherwise pass to success
                             options.success(e);
                         }
-                    });
+                    }, onError);
                 }
             }
         };
