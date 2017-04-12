@@ -450,20 +450,14 @@ var main = function() {
                 })[0];
 
                 var methodCall = reste[collectionConfig.read];
-
-                options.error = options.error ? options.error : config.onError;
-
-                methodCall(options, function(response) {
-
+                // success
+                var onLoad = function(response) {
                     if (options.success && response[collectionConfig.content]) {
-
                         // check if we have a return property
                         if (response[collectionConfig.content]) {
-
                             response[collectionConfig.content].forEach(function(item) {
                                 item.id = item[modelConfig.id];
                             });
-
                             options.success(response[collectionConfig.content]);
                             Alloy.Collections[collectionConfig.name].trigger("sync");
                         } else {
@@ -471,16 +465,19 @@ var main = function() {
                             response.forEach(function(item) {
                                 item.id = item[modelConfig.id];
                             });
-
                             options.success(response);
                             Alloy.Collections[collectionConfig.name].trigger("sync");
                         }
                     }
-                }, function(response) {
-                    if (options.error) {
-                        options.error(response);
-                    }
-                });
+                };
+                // Default error handler for options.error
+                if (config.onError) {
+                    model.on('error', function(originalModel, resp, options) {
+                        config.onError(resp, onLoad);
+                    });
+                }
+                // Call
+                methodCall(options, onLoad, options.error);
 
             } else if (model instanceof Backbone.Model) {
 
@@ -514,14 +511,9 @@ var main = function() {
                         params.body = modelConfig.beforeUpdate(params.body);
                     }
 
-                    var onError;
-                    options.error ? onError = function(e) {
-                        options.error(e);
-                    } : onError = null;
-
-                    reste[modelConfig.update](params, function(e) {
+                    // success
+                    var onLoad = function(e) {
                         // calls error handler if we have it defined and 201 returned
-
                         if (e.code > 200) {
                             if (options.error) {
                                 options.error(e);
@@ -530,7 +522,15 @@ var main = function() {
                             // otherwise pass to success
                             options.success(e);
                         }
-                    }, onError);
+                    }
+                    // Default error handler for options.error
+                    if (config.onError) {
+                        model.on('error', function(originalModel, resp, options) {
+                            config.onError(resp, onLoad);
+                        });
+                    }
+                    // Call
+                    reste[modelConfig.update](params, onLoad, options.error);
                 }
 
                 if (method == "read") {
@@ -543,17 +543,10 @@ var main = function() {
                             options[modelConfig.id] = model.id;
                         }
 
-                        var onError;
-                        options.error ? onError = function(e) {
-                            options.error(e);
-                        } : onError = null;
-
-                        reste[modelConfig.read](options, function(e) {
-
+                        // success
+                        var onLoad = function(e) {
                             if (modelConfig.content) {
-
                                 var results = e[modelConfig.content];
-
                                 if (results.length == 1) {
                                     options.success(results[0]);
                                 }
@@ -568,7 +561,15 @@ var main = function() {
                                     options.success(e);
                                 }
                             }
-                        }, onError);
+                        };
+                        // Default error handler for options.error
+                        if (config.onError) {
+                            model.on('error', function(originalModel, resp, options) {
+                                config.onError(resp, onLoad);
+                            });
+                        }
+                        // Call
+                        reste[modelConfig.read](options, onLoad, options.error);
                     }
                 }
 
@@ -585,16 +586,8 @@ var main = function() {
                         body = modelConfig.beforeDelete(body);
                     }
 
-                    var onError;
-                    options.error ? onError = function(e) {
-                        options.error(e);
-                    } : onError = null;
-
-                    reste[modelConfig.create]({
-                        body: body
-                    }, function(e) {
+                    var onLoad = function(e) {
                         // calls error handler if we have it defined and 201+ returned
-
                         if (e.code > 200) {
                             if (options.error) {
                                 options.error(e);
@@ -604,7 +597,17 @@ var main = function() {
                             e.id = e[modelConfig.id];
                             options.success(e);
                         }
-                    }, onError);
+                    };
+                    // Default error handler for options.error
+                    if (config.onError) {
+                        model.on('error', function(originalModel, resp, options) {
+                            config.onError(resp, onLoad);
+                        });
+                    }
+                    // Call
+                    reste[modelConfig.create]({
+                        body: body
+                    }, onLoad, options.error);
                 }
 
                 if (method == "delete") {
@@ -619,12 +622,8 @@ var main = function() {
                         body.body = modelConfig.beforeCreate(body.body);
                     }
 
-                    var onError;
-                    options.error ? onError = function(e) {
-                        options.error(e);
-                    } : onError = null;
-
-                    reste[modelConfig.delete](body, function(e) {
+                    // success
+                    var onLoad = function(e) {
                         // calls error handler if we have it defined and 201+ returned
                         if (e.code > 200) {
                             if (options.error) {
@@ -634,7 +633,15 @@ var main = function() {
                             // otherwise pass to success
                             options.success(e);
                         }
-                    }, onError);
+                    };
+                    // Default error handler for options.error
+                    if (config.onError) {
+                        model.on('error', function(originalModel, resp, options) {
+                            config.onError(resp, onLoad);
+                        });
+                    }
+                    // Call
+                    reste[modelConfig.delete](body, onLoad, options.error);
                 }
             }
         };
