@@ -170,16 +170,15 @@ var main = function() {
             }
 
             // if we have an onError method, use it
-            if (onError) {
+            if (config.onError) {
                 // if we have a global onError, we'll pass it on too do we can still use it locally if we want to
-                if (config.onError) {
+                if (onError) {
                     onError(error, retry, config.onError);
                 } else {
-                    onError(error, retry);
+                    config.onError(error, retry);
                 }
-            } else if (config.onError) {
-                // otherwise fallback to the one specified in config
-                config.onError(error, retry);
+            } else if (onError) {
+                onError(error, retry);
             } else if (onLoad) {
                 // otherwise revert to the onLoad callback
                 onLoad(error, retry);
