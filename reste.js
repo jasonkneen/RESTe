@@ -436,6 +436,10 @@ var main = function() {
             }
         };
 
+        // Need to override this to avoid wrapping the error handler
+        Backbone.wrapError = function(onError, originalModel, options) {
+            return onError || null;
+        };
         // Intercept sync to handle collections / models
         Backbone.sync = function(method, model, options) {
             log("Backbone.sync: " + method + " " + model._type);
@@ -470,14 +474,10 @@ var main = function() {
                         }
                     }
                 };
-                // Default error handler for options.error
-                if (config.onError) {
-                    model.on('error', function(originalModel, resp, options) {
-                        config.onError(resp, onLoad);
-                    });
-                }
+                // error
+                var onError = options.error ? function(e){ options.error(e); } : null;
                 // Call
-                methodCall(options, onLoad, options.error);
+                methodCall(options, onLoad, onError);
 
             } else if (model instanceof Backbone.Model) {
 
@@ -522,15 +522,11 @@ var main = function() {
                             // otherwise pass to success
                             options.success(e);
                         }
-                    }
-                    // Default error handler for options.error
-                    if (config.onError) {
-                        model.on('error', function(originalModel, resp, options) {
-                            config.onError(resp, onLoad);
-                        });
-                    }
+                    };
+                    // error
+                    var onError = options.error ? function(e){ options.error(e); } : null;
                     // Call
-                    reste[modelConfig.update](params, onLoad, options.error);
+                    reste[modelConfig.update](params, onLoad, onError);
                 }
 
                 if (method == "read") {
@@ -562,14 +558,10 @@ var main = function() {
                                 }
                             }
                         };
-                        // Default error handler for options.error
-                        if (config.onError) {
-                            model.on('error', function(originalModel, resp, options) {
-                                config.onError(resp, onLoad);
-                            });
-                        }
+                        // error
+                        var onError = options.error ? function(e){ options.error(e); } : null;
                         // Call
-                        reste[modelConfig.read](options, onLoad, options.error);
+                        reste[modelConfig.read](options, onLoad, onError);
                     }
                 }
 
@@ -598,16 +590,10 @@ var main = function() {
                             options.success(e);
                         }
                     };
-                    // Default error handler for options.error
-                    if (config.onError) {
-                        model.on('error', function(originalModel, resp, options) {
-                            config.onError(resp, onLoad);
-                        });
-                    }
+                    // error
+                    var onError = options.error ? function(e){ options.error(e); } : null;
                     // Call
-                    reste[modelConfig.create]({
-                        body: body
-                    }, onLoad, options.error);
+                    reste[modelConfig.create]({ body: body }, onLoad, onError);
                 }
 
                 if (method == "delete") {
@@ -634,14 +620,10 @@ var main = function() {
                             options.success(e);
                         }
                     };
-                    // Default error handler for options.error
-                    if (config.onError) {
-                        model.on('error', function(originalModel, resp, options) {
-                            config.onError(resp, onLoad);
-                        });
-                    }
+                    // error
+                    var onError = options.error ? function(e){ options.error(e); } : null;
                     // Call
-                    reste[modelConfig.delete](body, onLoad, options.error);
+                    reste[modelConfig.delete](body, onLoad, onError);
                 }
             }
         };
