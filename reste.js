@@ -156,7 +156,7 @@ var main = function() {
 
             var error;
 
-            if (config.errorsAsObjects){
+            if (config.errorsAsObjects) {
                 error = e;
                 error['content'] = parseJSON(http.responseText);
                 warn("Errors will be returned as objects.");
