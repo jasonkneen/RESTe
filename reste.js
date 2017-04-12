@@ -451,6 +451,8 @@ var main = function() {
 
                 var methodCall = reste[collectionConfig.read];
 
+                options.error = options.error ? options.error : config.onError;
+
                 methodCall(options, function(response) {
 
                     if (options.success && response[collectionConfig.content]) {
