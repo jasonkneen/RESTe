@@ -15,7 +15,7 @@ var main = function() {
 
     // generic log handler in DEV mode
     function warn(message) {
-            console.warn(message);
+        console.warn(message);
     }
 
     // sets up the config, headers, adds methods
@@ -160,7 +160,7 @@ var main = function() {
 
             var error;
 
-            if (config.errorsAsObjects){
+            if (config.errorsAsObjects) {
                 error = e;
                 error['content'] = parseJSON(http.responseText);
                 warn("RESTE:: Errors will be returned as objects.");
