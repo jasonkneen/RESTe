@@ -9,13 +9,13 @@ var main = function() {
     // generic log handler in DEV mode
     function log(message) {
         if (config.debug) {
-            console.log(message);
+            console.log("::RESTE:: " + message);
         }
     }
 
-    // generic log handler in DEV mode
+    // generic warning handler
     function warn(message) {
-            console.warn(message);
+        console.warn("::RESTE:: " + message);
     }
 
     // sets up the config, headers, adds methods
@@ -71,13 +71,13 @@ var main = function() {
 
         // debug the url
         if (args.url.indexOf("http") >= 0) {
-            log("::RESTE:: " + args.url);
+            log(args.url);
         } else {
-            log("::RESTE:: " + (config.url ? config.url + args.url : args.url));
+            log(config.url ? config.url + args.url : args.url);
         }
 
         if (args.params) {
-            log("::RESTE:: " + JSON.stringify(args.params));
+            log(JSON.stringify(args.params));
         }
 
 
@@ -114,9 +114,7 @@ var main = function() {
 
             http.setRequestHeader(header.name, typeof header.value == "function" ? header.value() : header.value);
 
-            if (config.debug) {
-                log("::RESTE:: Setting global header - " + header.name + ": " + (typeof header.value == "function" ? header.value() : header.value));
-            }
+            log("Setting global header - " + header.name + ": " + (typeof header.value == "function" ? header.value() : header.value));
         });
 
         // non-global headers
@@ -131,9 +129,7 @@ var main = function() {
 
                 http.setRequestHeader(header, typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]);
 
-                if (config.debug) {
-                    log("::RESTE:: Setting local header - " + header + ": " + (typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]));
-                }
+                log("Setting local header - " + header + ": " + (typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]));
             }
         }
 
@@ -154,7 +150,7 @@ var main = function() {
             e.url = args.url;
 
             function retry() {
-                log("Retrying");
+                log("Retrying...");
                 makeHttpRequest(args, onLoad, onError);
             }
 
@@ -163,13 +159,13 @@ var main = function() {
             if (config.errorsAsObjects){
                 error = e;
                 error['content'] = parseJSON(http.responseText);
-                warn("RESTE:: Errors will be returned as objects.");
+                warn("Errors will be returned as objects.");
             } else {
                 error = parseJSON(http.responseText);
-                warn("RESTE:: Future versions of RESTe will return errors as objects. Use config.errorsAsObjects = true to support this now and update your apps!");
+                warn("Future versions of RESTe will return errors as objects. Use config.errorsAsObjects = true to support this now and update your apps!");
             }
 
-            // if we have an onError method, use it
+            // if we have an onError method defined locally, use it
             if (onError) {
                 // if we have a global onError, we'll pass it on too do we can still use it locally if we want to
                 if (config.onError) {
@@ -190,36 +186,25 @@ var main = function() {
         };
 
         function send() {
-
-            // go
-            log(args.params);
-
             if (args.params && (args.method === "POST" || args.method === "PUT")) {
                 if (formEncode) {
                     http.send(args.params);
                 } else {
                     http.send(JSON.stringify(args.params));
                 }
-
             } else {
-
                 http.send();
             }
         }
 
         if (args.method == "POST" && config.beforePost) {
-
             // initialise empty params in case it's undefined
             args.params = args.params || {};
-
             config.beforePost(args.params, function(e) {
-
                 args.params = e;
             });
-
             send();
         } else {
-
             send();
         }
 
@@ -246,7 +231,7 @@ var main = function() {
                 changed = true;
             }
         });
-        if (!changed) {
+        if (! changed) {
             // add it
             requestHeaders.push({
                 name: Object.keys(header)[0],
@@ -264,10 +249,6 @@ var main = function() {
 
     // add a new method
     reste.addMethod = function(args) {
-        if (config.debug) {
-            console.log(args.requestHeaders);
-        }
-
         reste[args.name] = function(params, onLoad, onError) {
 
             var body,
@@ -288,7 +269,7 @@ var main = function() {
                 onError = deferred.reject;
             }
 
-            if (!onLoad && typeof(params) == "function") {
+            if (! onLoad && typeof(params) == "function") {
                 onLoad = params;
             } else {
                 for (var param in params) {
@@ -384,7 +365,6 @@ var main = function() {
         // if we have a config based transfor for th emodel
         // then attach this to the model, or create a default
         if (reste.modelConfig && reste.modelConfig[name] && reste.modelConfig[name].transform) {
-            alert("here")
             model.transform = function(model, transform) {
                 if (transform) {
                     this.__transform = transform(this);
@@ -410,7 +390,7 @@ var main = function() {
 
     reste.createCollection = function(name, content) {
 
-        if (!Alloy.Collections[name]) {
+        if (! Alloy.Collections[name]) {
             Alloy.Collections[name] = new Backbone.Collection();
         }
 
@@ -458,10 +438,7 @@ var main = function() {
 
         // Intercept sync to handle collections / models
         Backbone.sync = function(method, model, options) {
-            if (config.debug) {
-                console.log(method + model._type);
-            }
-
+            log("Backbone.sync: " + method + " " + model._type);
 
             var modelConfig = reste.modelConfig[model._type];
             var body;
@@ -473,6 +450,8 @@ var main = function() {
                 })[0];
 
                 var methodCall = reste[collectionConfig.read];
+
+                options.error = options.error ? options.error : config.onError;
 
                 methodCall(options, function(response) {
 
@@ -536,7 +515,6 @@ var main = function() {
                     }
 
                     var onError;
-
                     options.error ? onError = function(e) {
                         options.error(e);
                     } : onError = null;
@@ -565,6 +543,11 @@ var main = function() {
                             options[modelConfig.id] = model.id;
                         }
 
+                        var onError;
+                        options.error ? onError = function(e) {
+                            options.error(e);
+                        } : onError = null;
+
                         reste[modelConfig.read](options, function(e) {
 
                             if (modelConfig.content) {
@@ -585,7 +568,7 @@ var main = function() {
                                     options.success(e);
                                 }
                             }
-                        });
+                        }, onError);
                     }
                 }
 
@@ -602,6 +585,7 @@ var main = function() {
                         body = modelConfig.beforeDelete(body);
                     }
 
+                    var onError;
                     options.error ? onError = function(e) {
                         options.error(e);
                     } : onError = null;
@@ -635,6 +619,11 @@ var main = function() {
                         body.body = modelConfig.beforeCreate(body.body);
                     }
 
+                    var onError;
+                    options.error ? onError = function(e) {
+                        options.error(e);
+                    } : onError = null;
+
                     reste[modelConfig.delete](body, function(e) {
                         // calls error handler if we have it defined and 201+ returned
                         if (e.code > 200) {
@@ -645,7 +634,7 @@ var main = function() {
                             // otherwise pass to success
                             options.success(e);
                         }
-                    });
+                    }, onError);
                 }
             }
         };
