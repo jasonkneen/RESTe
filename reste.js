@@ -1,6 +1,7 @@
 var main = function() {
 
-    var reste = this;
+    var reste = this,
+        _ = require('alloy/underscore')._;
 
     // setup vars
     var config = {},
@@ -197,13 +198,28 @@ var main = function() {
             }
         }
 
-        if (args.method == "POST" && config.beforePost) {
+        // beforePost Hook
+        if (args.method == "POST" && config.beforePost && _.isFunction(config.beforePost)) {
             // initialise empty params in case it's undefined
             args.params = args.params || {};
             config.beforePost(args.params, function(e) {
                 args.params = e;
             });
-            send();
+            if (config.beforeLoad && _.isFunction(config.beforeLoad)) {
+                // Combined with beforeLoad Hook
+                config.beforeLoad(function(){
+                    send();
+                });
+            } else {
+                // no beforeLoad Hook
+                send();
+            }
+        // Only beforeLoad Hook
+        } else if (config.beforeLoad && _.isFunction(config.beforeLoad)) {
+            config.beforeLoad(function(){
+                send();
+            });
+        // No Hooks at all
         } else {
             send();
         }
