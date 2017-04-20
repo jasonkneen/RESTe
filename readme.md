@@ -250,6 +250,49 @@ api.updateVideo({
 });
 ```
 
+### Hooks: beforePost and beforeLoad
+
+Two hooks or events can be used within your RESTe configuration. Those hooks will happen before the `onLoad` or `onError` callabacks obviously. They will be executed before any request is send.
+
+#### beforePost
+
+This one is quite useful if you need to interfer with the parameters which are going to be used for the request.
+
+This hook will happen before `beforeLoad` if both are specified.
+
+Example:
+```javascript
+{
+    ...
+    beforePost: function(params, callback) {
+	params.something = 'else';
+        callback(params);
+    },
+    ...
+}
+```
+
+#### beforeLoad
+
+This one is quite useful if you need to run some checks before sending the actual request.
+
+This hook is the closest from the actual request submission.
+
+Example:
+```javascript
+{
+    ...
+    beforeLoad: function(load) {
+	if (Ti.Network.online) {
+	    load();
+	} else {
+	    alert("No internet connection!");
+	}
+    },
+    ...
+}
+```
+
 ## Local definitions
 
 Those apply when you decide to set those at a method definition level (for one endpoint only).

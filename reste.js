@@ -1,6 +1,7 @@
 var main = function() {
 
-    var reste = this;
+    var reste = this,
+        _ = require('alloy/underscore')._;
 
     // setup vars
     var config = {},
@@ -9,13 +10,13 @@ var main = function() {
     // generic log handler in DEV mode
     function log(message) {
         if (config.debug) {
-            console.log(message);
+            console.log("::RESTE:: " + message);
         }
     }
 
-    // generic log handler in DEV mode
+    // generic warning handler
     function warn(message) {
-        console.warn(message);
+        console.warn("::RESTE:: " + message);
     }
 
     // sets up the config, headers, adds methods
@@ -71,13 +72,13 @@ var main = function() {
 
         // debug the url
         if (args.url.indexOf("http") >= 0) {
-            log("::RESTE:: " + args.url);
+            log(args.url);
         } else {
-            log("::RESTE:: " + (config.url ? config.url + args.url : args.url));
+            log(config.url ? config.url + args.url : args.url);
         }
 
         if (args.params) {
-            log("::RESTE:: " + JSON.stringify(args.params));
+            log(JSON.stringify(args.params));
         }
 
 
@@ -114,9 +115,7 @@ var main = function() {
 
             http.setRequestHeader(header.name, typeof header.value == "function" ? header.value() : header.value);
 
-            if (config.debug) {
-                log("::RESTE:: Setting global header - " + header.name + ": " + (typeof header.value == "function" ? header.value() : header.value));
-            }
+            log("Setting global header - " + header.name + ": " + (typeof header.value == "function" ? header.value() : header.value));
         });
 
         // non-global headers
@@ -131,9 +130,7 @@ var main = function() {
 
                 http.setRequestHeader(header, typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]);
 
-                if (config.debug) {
-                    log("::RESTE:: Setting local header - " + header + ": " + (typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]));
-                }
+                log("Setting local header - " + header + ": " + (typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]));
             }
         }
 
@@ -154,7 +151,7 @@ var main = function() {
             e.url = args.url;
 
             function retry() {
-                log("Retrying");
+                log("Retrying...");
                 makeHttpRequest(args, onLoad, onError);
             }
 
@@ -163,22 +160,23 @@ var main = function() {
             if (config.errorsAsObjects) {
                 error = e;
                 error['content'] = parseJSON(http.responseText);
-                warn("RESTE:: Errors will be returned as objects.");
+                warn("Errors will be returned as objects.");
             } else {
                 error = parseJSON(http.responseText);
-                warn("RESTE:: Future versions of RESTe will return errors as objects. Use config.errorsAsObjects = true to support this now and update your apps!");
+                warn("Future versions of RESTe will return errors as objects. Use config.errorsAsObjects = true to support this now and update your apps!");
             }
 
-            // if we have an onError method, use it
-            if (config.onError) {
+            // if we have an onError method defined locally, use it
+            if (onError) {
                 // if we have a global onError, we'll pass it on too do we can still use it locally if we want to
-                if (onError) {
+                if (config.onError) {
                     onError(error, retry, config.onError);
                 } else {
-                    config.onError(error, retry);
+                    onError(error, retry);
                 }
-            } else if (onError) {
-                onError(error, retry);
+            } else if (config.onError) {
+                // otherwise fallback to the one specified in config
+                config.onError(error, retry);
             } else if (onLoad) {
                 // otherwise revert to the onLoad callback
                 onLoad(error, retry);
@@ -189,36 +187,40 @@ var main = function() {
         };
 
         function send() {
-
-            // go
-            log(args.params);
-
             if (args.params && (args.method === "POST" || args.method === "PUT")) {
                 if (formEncode) {
                     http.send(args.params);
                 } else {
                     http.send(JSON.stringify(args.params));
                 }
-
             } else {
-
                 http.send();
             }
         }
 
-        if (args.method == "POST" && config.beforePost) {
-
+        // beforePost Hook
+        if (args.method == "POST" && config.beforePost && _.isFunction(config.beforePost)) {
             // initialise empty params in case it's undefined
             args.params = args.params || {};
-
             config.beforePost(args.params, function(e) {
-
                 args.params = e;
             });
-
-            send();
+            if (config.beforeLoad && _.isFunction(config.beforeLoad)) {
+                // Combined with beforeLoad Hook
+                config.beforeLoad(function(){
+                    send();
+                });
+            } else {
+                // no beforeLoad Hook
+                send();
+            }
+        // Only beforeLoad Hook
+        } else if (config.beforeLoad && _.isFunction(config.beforeLoad)) {
+            config.beforeLoad(function(){
+                send();
+            });
+        // No Hooks at all
         } else {
-
             send();
         }
 
@@ -245,7 +247,7 @@ var main = function() {
                 changed = true;
             }
         });
-        if (!changed) {
+        if (! changed) {
             // add it
             requestHeaders.push({
                 name: Object.keys(header)[0],
@@ -263,10 +265,6 @@ var main = function() {
 
     // add a new method
     reste.addMethod = function(args) {
-        if (config.debug) {
-            console.log(args.requestHeaders);
-        }
-
         reste[args.name] = function(params, onLoad, onError) {
 
             var body,
@@ -287,7 +285,7 @@ var main = function() {
                 onError = deferred.reject;
             }
 
-            if (!onLoad && typeof(params) == "function") {
+            if (! onLoad && typeof(params) == "function") {
                 onLoad = params;
             } else {
                 for (var param in params) {
@@ -383,7 +381,6 @@ var main = function() {
         // if we have a config based transfor for th emodel
         // then attach this to the model, or create a default
         if (reste.modelConfig && reste.modelConfig[name] && reste.modelConfig[name].transform) {
-            alert("here")
             model.transform = function(model, transform) {
                 if (transform) {
                     this.__transform = transform(this);
@@ -409,7 +406,7 @@ var main = function() {
 
     reste.createCollection = function(name, content) {
 
-        if (!Alloy.Collections[name]) {
+        if (! Alloy.Collections[name]) {
             Alloy.Collections[name] = new Backbone.Collection();
         }
 
@@ -455,12 +452,13 @@ var main = function() {
             }
         };
 
+        // Need to override this to avoid wrapping the error handler
+        Backbone.wrapError = function(onError, originalModel, options) {
+            return onError || null;
+        };
         // Intercept sync to handle collections / models
         Backbone.sync = function(method, model, options) {
-            if (config.debug) {
-                console.log(method + model._type);
-            }
-
+            log("Backbone.sync: " + method + " " + model._type);
 
             var modelConfig = reste.modelConfig[model._type];
             var body;
@@ -472,18 +470,14 @@ var main = function() {
                 })[0];
 
                 var methodCall = reste[collectionConfig.read];
-
-                methodCall(options, function(response) {
-
+                // success
+                var onLoad = function(response) {
                     if (options.success && response[collectionConfig.content]) {
-
                         // check if we have a return property
                         if (response[collectionConfig.content]) {
-
                             response[collectionConfig.content].forEach(function(item) {
                                 item.id = item[modelConfig.id];
                             });
-
                             options.success(response[collectionConfig.content]);
                             Alloy.Collections[collectionConfig.name].trigger("sync");
                         } else {
@@ -491,16 +485,15 @@ var main = function() {
                             response.forEach(function(item) {
                                 item.id = item[modelConfig.id];
                             });
-
                             options.success(response);
                             Alloy.Collections[collectionConfig.name].trigger("sync");
                         }
                     }
-                }, function(response) {
-                    if (options.error) {
-                        options.error(response);
-                    }
-                });
+                };
+                // error
+                var onError = options.error ? function(e){ options.error(e); } : null;
+                // Call
+                methodCall(options, onLoad, onError);
 
             } else if (model instanceof Backbone.Model) {
 
@@ -534,15 +527,9 @@ var main = function() {
                         params.body = modelConfig.beforeUpdate(params.body);
                     }
 
-                    var onError;
-
-                    options.error ? onError = function(e) {
-                        options.error(e);
-                    } : onError = null;
-
-                    reste[modelConfig.update](params, function(e) {
+                    // success
+                    var onLoad = function(e) {
                         // calls error handler if we have it defined and 201 returned
-
                         if (e.code > 200) {
                             if (options.error) {
                                 options.error(e);
@@ -551,7 +538,11 @@ var main = function() {
                             // otherwise pass to success
                             options.success(e);
                         }
-                    }, onError);
+                    };
+                    // error
+                    var onError = options.error ? function(e){ options.error(e); } : null;
+                    // Call
+                    reste[modelConfig.update](params, onLoad, onError);
                 }
 
                 if (method == "read") {
@@ -564,12 +555,10 @@ var main = function() {
                             options[modelConfig.id] = model.id;
                         }
 
-                        reste[modelConfig.read](options, function(e) {
-
+                        // success
+                        var onLoad = function(e) {
                             if (modelConfig.content) {
-
                                 var results = e[modelConfig.content];
-
                                 if (results.length == 1) {
                                     options.success(results[0]);
                                 }
@@ -584,7 +573,11 @@ var main = function() {
                                     options.success(e);
                                 }
                             }
-                        });
+                        };
+                        // error
+                        var onError = options.error ? function(e){ options.error(e); } : null;
+                        // Call
+                        reste[modelConfig.read](options, onLoad, onError);
                     }
                 }
 
@@ -601,15 +594,8 @@ var main = function() {
                         body = modelConfig.beforeDelete(body);
                     }
 
-                    options.error ? onError = function(e) {
-                        options.error(e);
-                    } : onError = null;
-
-                    reste[modelConfig.create]({
-                        body: body
-                    }, function(e) {
+                    var onLoad = function(e) {
                         // calls error handler if we have it defined and 201+ returned
-
                         if (e.code > 200) {
                             if (options.error) {
                                 options.error(e);
@@ -619,7 +605,11 @@ var main = function() {
                             e.id = e[modelConfig.id];
                             options.success(e);
                         }
-                    }, onError);
+                    };
+                    // error
+                    var onError = options.error ? function(e){ options.error(e); } : null;
+                    // Call
+                    reste[modelConfig.create]({ body: body }, onLoad, onError);
                 }
 
                 if (method == "delete") {
@@ -634,7 +624,8 @@ var main = function() {
                         body.body = modelConfig.beforeCreate(body.body);
                     }
 
-                    reste[modelConfig.delete](body, function(e) {
+                    // success
+                    var onLoad = function(e) {
                         // calls error handler if we have it defined and 201+ returned
                         if (e.code > 200) {
                             if (options.error) {
@@ -644,7 +635,11 @@ var main = function() {
                             // otherwise pass to success
                             options.success(e);
                         }
-                    });
+                    };
+                    // error
+                    var onError = options.error ? function(e){ options.error(e); } : null;
+                    // Call
+                    reste[modelConfig.delete](body, onLoad, onError);
                 }
             }
         };
