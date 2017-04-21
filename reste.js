@@ -169,9 +169,11 @@ var main = function() {
                 warn("RESTE:: Future versions of RESTe will return errors as objects. Use config.errorsAsObjects = true to support this now and update your apps!");
             }
 
+            // if local error, handle it
             if (onError) {
                 onError(error, retry);
             } else if (config.onError) {
+                // otherwise go to global handler
                 config.onError(error, retry);
             } else if (onLoad) {
                 // otherwise revert to the onLoad callback
