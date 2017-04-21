@@ -456,7 +456,7 @@ var main = function() {
             log("Backbone.sync: " + method + model._type);
 
             var modelConfig = reste.modelConfig[model._type];
-            var body;
+            var body, onError;
 
             // if this is a collection, get the data and complete
             if (model instanceof Backbone.Collection) {
@@ -527,19 +527,14 @@ var main = function() {
                         params.body = modelConfig.beforeUpdate(params.body);
                     }
 
-                    var onError;
-
                     options.error ? onError = function(e) {
                         options.error(e);
                     } : onError = null;
 
                     reste[modelConfig.update](params, function(e) {
                         // calls error handler if we have it defined and 201 returned
-
                         if (e.code > 200) {
-                            if (options.error) {
-                                options.error(e);
-                            }
+                            onError(e);
                         } else {
                             // otherwise pass to success
                             options.success(e);
@@ -557,6 +552,10 @@ var main = function() {
                             options[modelConfig.id] = model.id;
                         }
 
+                        options.error ? onError = function(e) {
+                            options.error(e);
+                        } : onError = null;
+
                         reste[modelConfig.read](options, function(e) {
 
                             if (modelConfig.content) {
@@ -569,15 +568,13 @@ var main = function() {
                             } else {
                                 // calls error handler if we have it defined and 201+ returned
                                 if (e.code > 200) {
-                                    if (options.error) {
-                                        options.error(e);
-                                    }
+                                    onError(e);
                                 } else {
                                     // otherwise pass to success
                                     options.success(e);
                                 }
                             }
-                        });
+                        }, onError);
                     }
                 }
 
@@ -604,9 +601,7 @@ var main = function() {
                         // calls error handler if we have it defined and 201+ returned
 
                         if (e.code > 200) {
-                            if (options.error) {
-                                options.error(e);
-                            }
+                            onError(e);
                         } else {
                             // otherwise pass to success
                             e.id = e[modelConfig.id];
@@ -627,17 +622,19 @@ var main = function() {
                         body.body = modelConfig.beforeCreate(body.body);
                     }
 
+                    options.error ? onError = function(e) {
+                        options.error(e);
+                    } : onError = null;
+
                     reste[modelConfig.delete](body, function(e) {
                         // calls error handler if we have it defined and 201+ returned
                         if (e.code > 200) {
-                            if (options.error) {
-                                options.error(e);
-                            }
+                            onError(e);
                         } else {
                             // otherwise pass to success
                             options.success(e);
                         }
-                    });
+                    }, onError);
                 }
             }
         };
