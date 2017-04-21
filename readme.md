@@ -210,37 +210,43 @@ You can pass the _optional_ **onError** and **onLoad** handlers, which will inte
 
 Note, in the **onError** handler, you can (as of 1.2.0) also handle any network errors better -- in the example above a **retry** method is returned so you can check the error, display a specific one, or handle any network issues, and if required, issue a **retry()** which will attempt the last call again.
 
-If you've defined a **global onError()** within the configuration, it will passed onto any local `onError()` function defined for you methods. This way you can have something like:
+By default, a local error handler will override the global error handler. So if you want to use both (so have local fire first and then pass off to global, then handle this within your own app).
+
+In this example we have a function in the same file as the RESTe config like this:
+
+```javascript
+function globalError(e, retry) {
+    var dialog = Ti.UI.createAlertDialog({
+        title: "Connection error",
+        message: "There was an error connecting to the server, check your network connection and  retry.",
+        buttonNames: ['Retry']
+    });
+
+    dialog.addEventListener("click", function() {
+        retry();
+    });
+    dialog.show();
+}
+```
+and in our RESTe config we have:
 
 ```javascript
      methods: [{
         name: "courses",
         post: "functions/getCourses",
-        onError: function(e, callback, globalOnError) {
+        onError: function(e, callback) {
 		if (e.message) {
 			alert(e.message);
 		} else {
-			globalOnError();
-		}
-        }
+			globalError(e, callback);
+		}        
     }, {
         ...
     }],
-    onError: function(e, retry) {
-        var dialog = Ti.UI.createAlertDialog({
-            title: "Connection error",
-            message: "There was an error connecting to the server, check your network connection and  retry.",
-            buttonNames: ['Retry']
-        });
-
-        dialog.addEventListener("click", function() {
-            retry();
-        });
-        dialog.show();
-    },
+    onError: globalError,
 ```
 
-If there is an error message within the response, you'll display it within an `alert()`, otherwise the normal global `onError()` handler will be used.
+If there is an error message within the response, you'll display it within an alert(), otherwise the normal global onError() handler will be used.
 
 If you specify parameters required e.g. **videoId** then RESTe will automatically check for these in the parameters passed to the method, and raise an error if they're missing.
 
