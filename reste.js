@@ -116,9 +116,7 @@ var main = function() {
 
             http.setRequestHeader(header.name, typeof header.value == "function" ? header.value() : header.value);
 
-            if (config.debug) {
-                log("Setting global header - " + header.name + ": " + (typeof header.value == "function" ? header.value() : header.value));
-            }
+            log("Setting global header - " + header.name + ": " + (typeof header.value == "function" ? header.value() : header.value));
         });
 
         // non-global headers
@@ -133,9 +131,7 @@ var main = function() {
 
                 http.setRequestHeader(header, typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]);
 
-                if (config.debug) {
-                    log("Setting local header - " + header + ": " + (typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]));
-                }
+                log("Setting local header - " + header + ": " + (typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]));
             }
         }
 
@@ -264,9 +260,8 @@ var main = function() {
 
     // add a new method
     reste.addMethod = function(args) {
-        if (config.debug) {
-            log(args.requestHeaders);
-        }
+
+        log(args.requestHeaders);
 
         reste[args.name] = function(params, onLoad, onError) {
 
@@ -458,10 +453,7 @@ var main = function() {
 
         // Intercept sync to handle collections / models
         Backbone.sync = function(method, model, options) {
-            if (config.debug) {
-                log("Backbone.sync: " + method + model._type);
-            }
-
+            log("Backbone.sync: " + method + model._type);
 
             var modelConfig = reste.modelConfig[model._type];
             var body;
