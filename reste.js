@@ -8,14 +8,16 @@ var main = function() {
 
     // generic log handler in DEV mode
     function log(message) {
-        if (config.debug) {
+        if (config.debug && message) {
             console.log("::RESTE::" + message);
         }
     }
 
     // generic log handler in DEV mode
     function warn(message) {
-        console.warn("::RESTE::" + message);
+        if (config.debug && message) {
+            console.warn("::RESTE::" + message);
+        }
     }
 
     // sets up the config, headers, adds methods
@@ -154,7 +156,7 @@ var main = function() {
             e.url = args.url;
 
             function retry() {
-                log("Retrying");
+                log("Retrying...");
                 makeHttpRequest(args, onLoad, onError);
             }
 
@@ -457,7 +459,7 @@ var main = function() {
         // Intercept sync to handle collections / models
         Backbone.sync = function(method, model, options) {
             if (config.debug) {
-                log(method + model._type);
+                log("Backbone.sync: " + method + model._type);
             }
 
 
