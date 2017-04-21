@@ -9,13 +9,13 @@ var main = function() {
     // generic log handler in DEV mode
     function log(message) {
         if (config.debug) {
-            console.log(message);
+            console.log("::RESTE::" + message);
         }
     }
 
     // generic log handler in DEV mode
     function warn(message) {
-        console.warn(message);
+        console.warn("::RESTE::" + message);
     }
 
     // sets up the config, headers, adds methods
@@ -71,13 +71,13 @@ var main = function() {
 
         // debug the url
         if (args.url.indexOf("http") >= 0) {
-            log("::RESTE:: " + args.url);
+            log(args.url);
         } else {
-            log("::RESTE:: " + (config.url ? config.url + args.url : args.url));
+            log((config.url ? config.url + args.url : args.url));
         }
 
         if (args.params) {
-            log("::RESTE:: " + JSON.stringify(args.params));
+            log(JSON.stringify(args.params));
         }
 
 
@@ -115,7 +115,7 @@ var main = function() {
             http.setRequestHeader(header.name, typeof header.value == "function" ? header.value() : header.value);
 
             if (config.debug) {
-                log("::RESTE:: Setting global header - " + header.name + ": " + (typeof header.value == "function" ? header.value() : header.value));
+                log("Setting global header - " + header.name + ": " + (typeof header.value == "function" ? header.value() : header.value));
             }
         });
 
@@ -132,7 +132,7 @@ var main = function() {
                 http.setRequestHeader(header, typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]);
 
                 if (config.debug) {
-                    log("::RESTE:: Setting local header - " + header + ": " + (typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]));
+                    log("Setting local header - " + header + ": " + (typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]));
                 }
             }
         }
@@ -163,10 +163,10 @@ var main = function() {
             if (config.errorsAsObjects) {
                 error = e;
                 error.content = parseJSON(http.responseText);
-                warn("RESTE:: Errors will be returned as objects.");
+                warn("Errors will be returned as objects.");
             } else {
                 error = parseJSON(http.responseText);
-                warn("RESTE:: Future versions of RESTe will return errors as objects. Use config.errorsAsObjects = true to support this now and update your apps!");
+                warn("Future versions of RESTe will return errors as objects. Use config.errorsAsObjects = true to support this now and update your apps!");
             }
 
             // if local error, handle it
@@ -263,7 +263,7 @@ var main = function() {
     // add a new method
     reste.addMethod = function(args) {
         if (config.debug) {
-            console.log(args.requestHeaders);
+            log(args.requestHeaders);
         }
 
         reste[args.name] = function(params, onLoad, onError) {
@@ -457,7 +457,7 @@ var main = function() {
         // Intercept sync to handle collections / models
         Backbone.sync = function(method, model, options) {
             if (config.debug) {
-                console.log(method + model._type);
+                log(method + model._type);
             }
 
 
