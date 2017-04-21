@@ -169,16 +169,10 @@ var main = function() {
                 warn("RESTE:: Future versions of RESTe will return errors as objects. Use config.errorsAsObjects = true to support this now and update your apps!");
             }
 
-            // if we have an onError method, use it
-            if (config.onError) {
-                // if we have a global onError, we'll pass it on too do we can still use it locally if we want to
-                if (onError) {
-                    onError(error, retry, config.onError);
-                } else {
-                    config.onError(error, retry);
-                }
-            } else if (onError) {
+            if (onError) {
                 onError(error, retry);
+            } else if (config.onError) {
+                config.onError(error, retry);
             } else if (onLoad) {
                 // otherwise revert to the onLoad callback
                 onLoad(error, retry);
