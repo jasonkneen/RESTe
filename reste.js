@@ -185,7 +185,6 @@ var main = function() {
         };
 
         function send() {
-
             // go
             log(args.params);
 
@@ -195,26 +194,44 @@ var main = function() {
                 } else {
                     http.send(JSON.stringify(args.params));
                 }
-
             } else {
-
                 http.send();
             }
         }
 
-        if (args.method == "POST" && config.beforePost) {
+        args.params = args.params || {};
+
+        if (args.method == "POST" && typeof config.beforePost == "function") {
 
             // initialise empty params in case it's undefined
-            args.params = args.params || {};
 
             config.beforePost(args.params, function(e) {
-
                 args.params = e;
+                send();
             });
 
-            send();
-        } else {
+        } else if (args.method == "GET" && typeof config.beforeGet == "function") {
 
+            config.beforeGet(args.params, function(e) {
+                args.params = e;
+                send();
+            });
+
+        } else if (args.method == "PUT" && typeof config.beforePut == "function") {
+
+            config.beforePut(args.params, function(e) {
+                args.params = e;
+                send();
+            });
+
+        } else if (args.method == "DELETE" && typeof config.beforeDelete == "function") {
+
+            config.beforeDelete(args.params, function(e) {
+                args.params = e;
+                send();
+            });
+
+        } else {
             send();
         }
 
