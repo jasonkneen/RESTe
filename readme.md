@@ -2,7 +2,7 @@
 
 ## FUTURE BREAKING CHANGE
 
-In 1.4.5, a new option to support error objects is available. It's off by default and can be switched on by setting: 
+In 1.4.5, a new option to support error objects is available. It's off by default and can be switched on by setting:
 
 ```JS
 .errorsAsObjects = true
@@ -127,7 +127,46 @@ api.config({
 });
 ```
 
-**NOTE:** You can't put the config in the same file as one that is using any bindings to the models/collections define *in* the config. This is because Alloy will attempt to resolve any references for **dataCollection** before the config is ready -- so for best results put the config into alloy.js directly OR as a require to a config file in the app/lib folder. 
+**NOTE:** You can't put the config in the same file as one that is using any bindings to the models/collections define *in* the config. This is because Alloy will attempt to resolve any references for **dataCollection** before the config is ready -- so for best results put the config into alloy.js directly OR as a require to a config file in the app/lib folder.
+
+### Hooks: beforePost, beforeGet, beforePut, beforeDelete
+
+Several hooks or events can be used within your RESTe configuration. Those hooks will happen before specific calls are made. They will be executed before any request is sent.
+
+beforePost:
+
+This one is quite useful if you need to change  the parameters which are going to be used for the request.
+
+This hook will happen before beforeLoad if both are specified.
+
+Example:
+
+{
+    ...
+    beforePost: function(params, callback) {
+	params.something = 'else';
+        callback(params);
+    },
+    ...
+}
+
+beforeSend:
+
+These are similar to beforeSend but works for all requests (GET, PUT, DELETE, POST)
+
+Example:
+
+{
+    ...
+    beforeSend: function(data, callback) {
+	if (Ti.Network.online) {
+	    callback(data);
+	} else {
+	    alert("No internet connection!");
+	}
+    },
+    ...
+}
 
 ### Errors
 

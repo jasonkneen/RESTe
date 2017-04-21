@@ -210,23 +210,9 @@ var main = function() {
                 send();
             });
 
-        } else if (args.method == "GET" && typeof config.beforeGet == "function") {
+        } else if (typeof config.beforeSend == "function") {
 
-            config.beforeGet(args.params, function(e) {
-                args.params = e;
-                send();
-            });
-
-        } else if (args.method == "PUT" && typeof config.beforePut == "function") {
-
-            config.beforePut(args.params, function(e) {
-                args.params = e;
-                send();
-            });
-
-        } else if (args.method == "DELETE" && typeof config.beforeDelete == "function") {
-
-            config.beforeDelete(args.params, function(e) {
+            config.beforeSend(args.params, function(e) {
                 args.params = e;
                 send();
             });
