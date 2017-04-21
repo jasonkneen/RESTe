@@ -66,6 +66,7 @@ The main things I wanted to achieve were:-
 
 * Simple to implement in an new project, or replace an existing API layer
 * Supports headers, tokens, events
+* Support for Alloy Collections / Models
 * Minimal code
 
 ## Quick Start
@@ -74,7 +75,7 @@ The main things I wanted to achieve were:-
 or
 * [Download the latest version](https://github.com/jasonkneen/reste) and place in your project (lib folder for Alloy).
 
-Wherever you want to initialise the API interface, put this (ideally this should go in your alloy.js directly or create a config file in the app/lib folder and require from alloy.js):-
+Ideally you should put your RESTe config in alloy.js OR in an app/lib file that is called from alloy.js or *before* you intend to use any colletions / models:-
 
 ```javascript
 var reste = require("reste");
@@ -127,20 +128,18 @@ api.config({
 });
 ```
 
-**NOTE:** You can't put the config in the same file as one that is using any bindings to the models/collections define *in* the config. This is because Alloy will attempt to resolve any references for **dataCollection** before the config is ready -- so for best results put the config into alloy.js directly OR as a require to a config file in the app/lib folder.
+**IMPORTANT:** You can't put the config in the same file as a controller that is binding with Alloy. This is because Alloy will attempt to resolve any references for **dataCollection** *before* the config is ready -- so for best results put the config into alloy.js directly OR require it from a lib/whatever.js file from alloy.js.
 
-### Hooks: beforePost, beforeGet, beforePut, beforeDelete
+### Hooks: beforePost, beforeSend
 
-Several hooks or events can be used within your RESTe configuration. Those hooks will happen before specific calls are made. They will be executed before any request is sent.
+A couple of useful hooks or events can be used within your RESTe global configuration. Those hooks will happen before specific calls are made. They will be executed before any request is sent allowing you to a) change the parameters or b) stop the call happening.
 
 beforePost:
 
-This one is quite useful if you need to change  the parameters which are going to be used for the request.
-
-This hook will happen before beforeLoad if both are specified.
+This one is quite useful if you need to change the parameters which are going to be used for the request. You might for example -- if you're using Parse Server -- want to strip out certain parameters from models before sending them.
 
 Example:
-
+```javascript
 {
     ...
     beforePost: function(params, callback) {
@@ -149,13 +148,13 @@ Example:
     },
     ...
 }
-
+```
 beforeSend:
 
-These are similar to beforeSend but works for all requests (GET, PUT, DELETE, POST)
+These are similar to beforeSend but works for all requests (GET, PUT, DELETE, POST). If you specify both beforePost and beforeLoad then beforePost will go first, then beforeSend.
 
 Example:
-
+```javascript
 {
     ...
     beforeSend: function(data, callback) {
@@ -167,22 +166,10 @@ Example:
     },
     ...
 }
-
+```
 ### Errors
 
-By default RESTe returns the body of the reponse from the API when an error occurs using `responseText` from the HTTP Client.
-
-Example of the object returned by default:
-```javascript
-{
-    "success": false,
-    "code": 401,
-    "source": "[object TiNetworkHTTPClient]",
-    "type": "error",
-    "error": "HTTP error",
-    "url": "http://lorem.ipsum.com"
-}
-```
+By default RESTe returns the body of the response from the API when an error occurs using `responseText` from the HTTP Client.
 
 You can change this by specifying `errorsAsObjects: true` within your RESTe config so you get the full error object back. This will include the error object as well as the body response from the API which will be accessible from the `content` property on the object returned.
 
@@ -202,7 +189,7 @@ Example of a the object returned including the error and the response body:
 }
 ```
 
-This is really convenient if you need to access both the HTTP status code as well as the potential error message returned from the API.
+This is really useful if you need to access both the HTTP status code as well as the potential error message returned from the API.
 
 ### onError() and onLoad()
 
@@ -245,8 +232,6 @@ and in our RESTe config we have:
     }],
     onError: globalError,
 ```
-
-If there is an error message within the response, you'll display it within an alert(), otherwise the normal global onError() handler will be used.
 
 If you specify parameters required e.g. **videoId** then RESTe will automatically check for these in the parameters passed to the method, and raise an error if they're missing.
 
@@ -402,7 +387,7 @@ api.clearCookies();
 
 RESTe supports collection and model generation. So it supports creating and managing collections and models, binding, and CRUD methods to Create, Update and Delete models.
 
-**NOTE**: If you are using the Alloy Collections and Model Support of RESTe, you should **not** use the Alloy Model / Collection definitions -- so you shouldn't have an app/models folder with models defined. You must also **not** use the <Collection src="etc"/> notation in the XML -- you *just* use the dataCollection binding in a repeater.
+**NOTE**: If you are using the Alloy Collections and Model Support of RESTe, you should **not** use the Alloy Model / Collection definitions -- so you shouldn't have an app/models folder with models defined. You must also **not** use the <Collection src="etc"/> notation in the XML -- you *just* use the dataCollection binding in a repeating element.
 
 You can also now perform transform functions at a global (config) level or locally in a controller / view -- this is really useful if you use Alloy and pass models to views using **$model**
 
@@ -568,7 +553,7 @@ user.save({
 ## License
 
 <pre>
-Copyright 2016 Jason Kneen
+Copyright Jason Kneen
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
