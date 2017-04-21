@@ -162,7 +162,7 @@ var main = function() {
 
             if (config.errorsAsObjects) {
                 error = e;
-                error['content'] = parseJSON(http.responseText);
+                error.content = parseJSON(http.responseText);
                 warn("RESTE:: Errors will be returned as objects.");
             } else {
                 error = parseJSON(http.responseText);
