@@ -459,7 +459,7 @@ var main = function() {
             var body, onError;
 
             // if this is a collection, get the data and complete
-            if (model instanceof Backbone.Collection) {
+            if (model instanceof Backbone.Collection && modelConfig && modelConfig.collections) {
                 var collectionConfig = _.where(modelConfig.collections, {
                     name: model._name
                 })[0];
