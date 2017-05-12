@@ -410,7 +410,12 @@ var main = function() {
         }
 
         if (content instanceof Array) {
+            // on-the-fly collection, so populate from array
             Alloy.Collections[name].reset(content);
+            // and override fetch to trigger a change event
+            Alloy.Collections[name].fetch = function(){
+                Alloy.Collections[name].trigger("change");
+            };
         } else {
             throw "No Array specified for createCollection";
         }
