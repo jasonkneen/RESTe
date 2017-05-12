@@ -414,7 +414,6 @@ var main = function() {
         } else {
             throw "No Array specified for createCollection";
         }
-
     };
 
     function initModels() {
