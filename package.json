@@ -1,6 +1,6 @@
 {
   "name": "reste",
-  "version": "1.4.8",
+  "version": "1.4.9",
   "description": "A JavaScript REST / API helper for Titanium with Alloy Models/Collections support",
   "titaniumManifest": {
     "guid": "afafe8b0-b93b-771c-a9e5-4e71db81b9ff"
