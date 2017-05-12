@@ -453,7 +453,7 @@ var main = function() {
 
         // Intercept sync to handle collections / models
         Backbone.sync = function(method, model, options) {
-            log("Backbone.sync: " + method + model._type);
+            log("Backbone.sync: " + method + " " + model._type);
 
             var modelConfig = reste.modelConfig[model._type];
             var body, onError;
