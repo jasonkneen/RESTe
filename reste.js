@@ -517,7 +517,7 @@ var main = function() {
 
             } else if ( model instanceof Backbone.Model) {
 
-                if (model.id && method == "create") {
+                if (model.get("id") && method == "create") {
                     method = "update";
                 }
 
@@ -534,7 +534,7 @@ var main = function() {
                     }
 
                     // update!
-                    params[modelConfig.id] = model.id;
+                    params[modelConfig.id] = model.get("id");
 
                     params.body = params.body || model.toJSON();
 
@@ -568,8 +568,8 @@ var main = function() {
 
                         if (model[modelConfig.id]) {
                             options[modelConfig.id] = model[modelConfig.id];
-                        } else if (model.id) {
-                            options[modelConfig.id] = model.id;
+                        } else if (model.get("id")) {
+                            options[modelConfig.id] = model.get("id");
                         }
 
                         options.error ? onError = function(e) {
@@ -625,6 +625,7 @@ var main = function() {
                         } else {
                             // otherwise pass to success
                             e.id = e[modelConfig.id];
+                            model.set("id", e[modelConfig.id]);
                             options.success(e);
                         }
                     }, onError);
@@ -634,7 +635,7 @@ var main = function() {
 
                     body = {};
 
-                    body[modelConfig.id] = model.id;
+                    body[modelConfig.id] = model.get("id");
                     body.body = model.toJSON();
 
                     // change to change the attributes before sending
