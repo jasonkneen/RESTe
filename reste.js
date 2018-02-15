@@ -494,7 +494,7 @@ var main = function() {
                         }
                     }
                   } else {
-                    option.success(null);
+                    option.success(response);
                   }
                 }, function(response) {
                     if (options.error) {
