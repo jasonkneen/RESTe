@@ -378,7 +378,7 @@ var main = function() {
 
         // if we have a config based transfor for th emodel
         // then attach this to the model, or create a default
-        if (reste.modelConfig && reste.modelConfig[name] && reste.modelConfig[name].transform) {            
+        if (reste.modelConfig && reste.modelConfig[name] && reste.modelConfig[name].transform) {
             model.transform = function(model, transform) {
                 if (transform) {
                     this.__transform = transform(this);
@@ -471,6 +471,7 @@ var main = function() {
 
                 methodCall(options, function(response) {
 
+                  if ((response != null) && (response != undefined)) {
                     if (options.success && response[collectionConfig.content]) {
 
                         // check if we have a return property
@@ -492,6 +493,9 @@ var main = function() {
                             Alloy.Collections[collectionConfig.name].trigger("sync");
                         }
                     }
+                  } else {
+                    option.success(null);
+                  }
                 }, function(response) {
                     if (options.error) {
                         options.error(response);
