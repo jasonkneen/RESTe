@@ -82,12 +82,12 @@ var main = function() {
             log(JSON.stringify(args.params));
         }
 
-
         // create a client
         var http = Ti.Network.createHTTPClient();
 
         reste.clearCookies = function() {
-            if (http) http.clearCookies(config.url);
+            if (http)
+                http.clearCookies(config.url);
         };
 
         var formEncode = false;
@@ -116,7 +116,7 @@ var main = function() {
 
             http.setRequestHeader(header.name, typeof header.value == "function" ? header.value() : header.value);
 
-            log("Setting global header - " + header.name + ": " + (typeof header.value == "function" ? header.value() : header.value));
+            log("Setting global header - " + header.name + ": " + ( typeof header.value == "function" ? header.value() : header.value));
         });
 
         // non-global headers
@@ -131,7 +131,7 @@ var main = function() {
 
                 http.setRequestHeader(header, typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]);
 
-                log("Setting local header - " + header + ": " + (typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]));
+                log("Setting local header - " + header + ": " + ( typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]));
             }
         }
 
@@ -197,20 +197,23 @@ var main = function() {
             }
         }
 
+
         args.params = args.params || {};
 
-        if (args.method == "POST" && typeof config.beforePost == "function") {
+        var beforePost = args.beforePost || config.beforePost;
+        var beforeSend = args.beforeSend || config.beforeSend;
+
+        if (args.method == "POST" && typeof beforePost == "function") {
 
             // initialise empty params in case it's undefined
 
-            config.beforePost(args.params, function(e) {
+            beforePost(args.params, function(e) {
                 args.params = e;
                 send();
             });
 
-        } else if (typeof config.beforeSend == "function") {
-
-            config.beforeSend(args.params, function(e) {
+        } else if ( typeof beforeSend == "function") {
+            beforeSend(args.params, function(e) {
                 args.params = e;
                 send();
             });
@@ -226,8 +229,8 @@ var main = function() {
         requestHeaders = [];
         for (var header in headers) {
             requestHeaders.push({
-                name: header,
-                value: headers[header]
+                name : header,
+                value : headers[header]
             });
         }
     };
@@ -245,8 +248,8 @@ var main = function() {
         if (!changed) {
             // add it
             requestHeaders.push({
-                name: Object.keys(header)[0],
-                value: header[Object.keys(header)[0]]
+                name : Object.keys(header)[0],
+                value : header[Object.keys(header)[0]]
             });
         }
     };
@@ -270,20 +273,24 @@ var main = function() {
                 url,
                 deferred;
 
-            if (args.post) method = "POST";
-            if (args.get) method = "GET";
-            if (args.put) method = "PUT";
-            if (args.delete) method = "DELETE";
+            if (args.post)
+                method = "POST";
+            if (args.get)
+                method = "GET";
+            if (args.put)
+                method = "PUT";
+            if (args.delete)
+                method = "DELETE";
 
             url = args[method.toLowerCase()] || args.get;
 
-            if (config.Q && !onLoad && typeof(params) != "function") {
+            if (config.Q && !onLoad && typeof (params) != "function") {
                 deferred = config.Q.defer();
                 onLoad = deferred.resolve;
                 onError = deferred.reject;
             }
 
-            if (!onLoad && typeof(params) == "function") {
+            if (!onLoad && typeof (params) == "function") {
                 onLoad = params;
             } else {
                 for (var param in params) {
@@ -291,7 +298,7 @@ var main = function() {
                         body = params[param];
                     } else {
                         while (url.indexOf("<" + param + ">") >= 0) {
-                            if (typeof params[param] == "object") {
+                            if ( typeof params[param] == "object") {
                                 url = url.replace("<" + param + ">", JSON.stringify(params[param]));
                             } else {
                                 url = url.replace("<" + param + ">", params[param]);
@@ -327,21 +334,24 @@ var main = function() {
                 });
 
                 makeHttpRequest({
-                    url: url,
-                    method: method,
-                    params: body,
-                    headers: args.requestHeaders || args.headers,
+                    url : url,
+                    method : method,
+                    params : body,
+                    headers : args.requestHeaders || args.headers,
+                    beforePost : args.beforePost,
+                    beforeSend : args.beforeSend
                 }, onLoad, onError);
 
             } else {
 
-                var m, missing = [],
+                var m,
+                    missing = [],
                     re = /(\<\w*\>)/g;
 
                 //work out which parameters are required
                 if (config.autoValidateParams) {
 
-                    while ((m = re.exec(url)) !== null) {
+                    while (( m = re.exec(url)) !== null) {
                         if (m.index === re.lastIndex) {
                             re.lastIndex++;
                         }
@@ -356,10 +366,12 @@ var main = function() {
                 } else {
 
                     makeHttpRequest({
-                        url: url,
-                        method: method,
-                        params: body,
-                        headers: args.requestHeaders || args.headers,
+                        url : url,
+                        method : method,
+                        params : body,
+                        headers : args.requestHeaders || args.headers,
+                        beforePost : args.beforePost,
+                        beforeSend : args.beforeSend
                     }, onLoad, onError);
                 }
             }
@@ -378,7 +390,7 @@ var main = function() {
 
         // if we have a config based transfor for th emodel
         // then attach this to the model, or create a default
-        if (reste.modelConfig && reste.modelConfig[name] && reste.modelConfig[name].transform) {            
+        if (reste.modelConfig && reste.modelConfig[name] && reste.modelConfig[name].transform) {
             model.transform = function(model, transform) {
                 if (transform) {
                     this.__transform = transform(this);
@@ -408,11 +420,11 @@ var main = function() {
             Alloy.Collections[name] = new Backbone.Collection();
         }
 
-        if (content instanceof Array) {
+        if ( content instanceof Array) {
             // on-the-fly collection, so populate from array
             Alloy.Collections[name].reset(content);
             // and override fetch to trigger a change event
-            Alloy.Collections[name].fetch = function(){
+            Alloy.Collections[name].fetch = function() {
                 Alloy.Collections[name].trigger("change");
             };
         } else {
@@ -430,9 +442,9 @@ var main = function() {
             reste.modelConfig[args.name] = args;
 
             var model = Backbone.Model.extend({
-                _type: args.name,
-                _method: args.name,
-                transform: function(model, transform) {
+                _type : args.name,
+                _method : args.name,
+                transform : function(model, transform) {
                     if (transform) {
                         this.__transform = transform(this);
                     } else if (args.transform) {
@@ -459,12 +471,13 @@ var main = function() {
             log("Backbone.sync: " + method + " " + model._type);
 
             var modelConfig = reste.modelConfig[model._type];
-            var body, onError;
+            var body,
+                onError;
 
             // if this is a collection, get the data and complete
-            if (model instanceof Backbone.Collection && modelConfig && modelConfig.collections) {
+            if ( model instanceof Backbone.Collection && modelConfig && modelConfig.collections) {
                 var collectionConfig = _.where(modelConfig.collections, {
-                    name: model._name
+                name: model._name
                 })[0];
 
                 var methodCall = reste[collectionConfig.read];
@@ -498,7 +511,7 @@ var main = function() {
                     }
                 });
 
-            } else if (model instanceof Backbone.Model) {
+            } else if ( model instanceof Backbone.Model) {
 
                 if (model.id && method == "create") {
                     method = "update";
@@ -599,7 +612,7 @@ var main = function() {
                     } : onError = null;
 
                     reste[modelConfig.create]({
-                        body: body
+                        body : body
                     }, function(e) {
                         // calls error handler if we have it defined and 201+ returned
 
