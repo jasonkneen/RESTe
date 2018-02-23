@@ -484,6 +484,7 @@ var main = function() {
 
                 methodCall(options, function(response) {
 
+                  if ((response != null) && (response != undefined)) {
                     if (options.success && response[collectionConfig.content]) {
 
                         // check if we have a return property
@@ -505,6 +506,9 @@ var main = function() {
                             Alloy.Collections[collectionConfig.name].trigger("sync");
                         }
                     }
+                  } else {
+                    option.success(response);
+                  }
                 }, function(response) {
                     if (options.error) {
                         options.error(response);
