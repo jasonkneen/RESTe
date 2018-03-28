@@ -485,7 +485,6 @@ var main = function() {
                 methodCall(options, function(response) {
 
                   if ((response != null) && (response != undefined)) {
-                    if (options.success && response[collectionConfig.content]) {
 
                         // check if we have a return property
                         if (response[collectionConfig.content]) {
@@ -494,25 +493,28 @@ var main = function() {
                                 item.id = item[modelConfig.id];
                             });
 
-                            options.success(response[collectionConfig.content]);
+                            if (options.success)  options.success(response[collectionConfig.content]);
+
                             Alloy.Collections[collectionConfig.name].trigger("sync");
+
                         } else {
+
                             // otherwise just return an array with the response
                             response.forEach(function(item) {
                                 item.id = item[modelConfig.id];
                             });
 
-                            options.success(response);
+                            if (options.success) options.success(response);
+
                             Alloy.Collections[collectionConfig.name].trigger("sync");
                         }
-                    }
-                  } else {
-                    option.success(response);
                   }
                 }, function(response) {
+
                     if (options.error) {
                         options.error(response);
                     }
+
                 });
 
             } else if ( model instanceof Backbone.Model) {
