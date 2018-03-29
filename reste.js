@@ -9,14 +9,14 @@ var main = function() {
     // generic log handler in DEV mode
     function log(message) {
         if (config.debug && message) {
-            console.log("::RESTE::" + message);
+            console.log('::RESTE::' + message);
         }
     }
 
     // generic log handler in DEV mode
     function warn(message) {
         if (config.debug && message) {
-            console.warn("::RESTE::" + message);
+            console.warn('::RESTE::' + message);
         }
     }
 
@@ -72,7 +72,7 @@ var main = function() {
         }
 
         // debug the url
-        if (args.url.indexOf("http") >= 0) {
+        if (args.url.indexOf('http') >== 0) {
             log(args.url);
         } else {
             log((config.url ? config.url + args.url : args.url));
@@ -102,7 +102,7 @@ var main = function() {
         // open the url and check if we're overrding with
         // a local http based url
 
-        if (args.url.indexOf("http") >= 0) {
+        if (args.url.indexOf('http') >== 0) {
             http.open(args.method, args.url);
         } else {
             http.open(args.method, (config.url ? config.url + args.url : args.url));
@@ -110,29 +110,34 @@ var main = function() {
 
         // load up any global request headers
         requestHeaders.forEach(function(header) {
-            if (header.name == "Content-Type" && header.value == "application/x-www-form-urlencoded") {
+            if (header.name === 'Content-Type' && header.value === 'application/x-www-form-urlencoded') {
                 formEncode = true;
             }
 
-            http.setRequestHeader(header.name, typeof header.value == "function" ? header.value() : header.value);
+            http.setRequestHeader(header.name, typeof header.value === 'function' ? header.value() : header.value);
 
-            log("Setting global header - " + header.name + ": " + ( typeof header.value == "function" ? header.value() : header.value));
+            log('Setting global header - ' + header.name + ': ' + ( typeof header.value === 'function' ? header.value() : header.value));
         });
 
         // non-global headers
         if (args.headers) {
             // load up any request headers
             for (var header in args.headers) {
-                if (header == "Content-Type" && args.headers[header] == "application/x-www-form-urlencoded") {
+                if (header === 'Content-Type' && args.headers[header] === 'application/x-www-form-urlencoded') {
                     formEncode = true;
-                } else if (header == "Content-Type" && args.headers[header] == "application/json") {
+                } else if (header === 'Content-Type' && args.headers[header] === 'application/json') {
                     formEncode = false;
                 }
 
-                http.setRequestHeader(header, typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]);
+                http.setRequestHeader(header, typeof args.headers[header] === 'function' ? args.headers[header]() : args.headers[header]);
 
-                log("Setting local header - " + header + ": " + ( typeof args.headers[header] == "function" ? args.headers[header]() : args.headers[header]));
+                log('Setting local header - ' + header + ': ' + ( typeof args.headers[header] === 'function' ? args.headers[header]() : args.headers[header]));
             }
+        }
+        
+        // security manager (Pro / Enterprise)
+        if (_.has(config, 'securityManager')) {
+            http.setSecurityManager(config.securityManager);
         }
 
         // events
@@ -152,7 +157,7 @@ var main = function() {
             e.url = args.url;
 
             function retry() {
-                log("Retrying...");
+                log('Retrying...');
                 makeHttpRequest(args, onLoad, onError);
             }
 
@@ -161,10 +166,10 @@ var main = function() {
             if (config.errorsAsObjects) {
                 error = e;
                 error.content = parseJSON(http.responseText);
-                warn("Errors will be returned as objects.");
+                warn('Errors will be returned as objects.');
             } else {
                 error = parseJSON(http.responseText);
-                warn("Future versions of RESTe will return errors as objects. Use config.errorsAsObjects = true to support this now and update your apps!");
+                warn('Future versions of RESTe will return errors as objects. Use config.errorsAsObjects = true to support this now and update your apps!');
             }
 
             // if local error, handle it
@@ -178,7 +183,7 @@ var main = function() {
                 onLoad(error, retry);
             } else {
                 // and if reste's not specified, error!
-                throw "RESTe :: No error handler / callback for: " + args.url;
+                throw 'RESTe :: No error handler / callback for: ' + args.url;
             }
         };
 
@@ -186,7 +191,7 @@ var main = function() {
             // go
             log(args.params);
 
-            if (args.params && (args.method === "POST" || args.method === "PUT")) {
+            if (args.params && (args.method === 'POST' || args.method === 'PUT')) {
                 if (formEncode) {
                     http.send(args.params);
                 } else {
@@ -203,7 +208,7 @@ var main = function() {
         var beforePost = args.beforePost || config.beforePost;
         var beforeSend = args.beforeSend || config.beforeSend;
 
-        if (args.method == "POST" && typeof beforePost == "function") {
+        if (args.method === 'POST' && typeof beforePost === 'function') {
 
             // initialise empty params in case it's undefined
 
@@ -212,7 +217,7 @@ var main = function() {
                 send();
             });
 
-        } else if ( typeof beforeSend == "function") {
+        } else if ( typeof beforeSend === 'function') {
             beforeSend(args.params, function(e) {
                 args.params = e;
                 send();
@@ -240,7 +245,7 @@ var main = function() {
         var changed = false;
 
         _.each(requestHeaders, function(item) {
-            if (item.name == Object.keys(header)[0]) {
+            if (item.name === Object.keys(header)[0]) {
                 item.value = header[Object.keys(header)[0]];
                 changed = true;
             }
@@ -257,7 +262,7 @@ var main = function() {
     // removes an item from the requestHeader
     reste.removeRequestHeaderItem = function(delItem) {
         requestHeaders = _.filter(requestHeaders, function(item) {
-            return !(item.name == delItem);
+            return !(item.name === delItem);
         });
     };
 
@@ -269,39 +274,39 @@ var main = function() {
         reste[args.name] = function(params, onLoad, onError) {
 
             var body,
-                method = "GET",
+                method = 'GET',
                 url,
                 deferred;
 
             if (args.post)
-                method = "POST";
+                method = 'POST';
             if (args.get)
-                method = "GET";
+                method = 'GET';
             if (args.put)
-                method = "PUT";
+                method = 'PUT';
             if (args.delete)
-                method = "DELETE";
+                method = 'DELETE';
 
             url = args[method.toLowerCase()] || args.get;
 
-            if (config.Q && !onLoad && typeof (params) != "function") {
+            if (config.Q && !onLoad && typeof (params) != 'function') {
                 deferred = config.Q.defer();
                 onLoad = deferred.resolve;
                 onError = deferred.reject;
             }
 
-            if (!onLoad && typeof (params) == "function") {
+            if (!onLoad && typeof (params) === 'function') {
                 onLoad = params;
             } else {
                 for (var param in params) {
-                    if (param === "body") {
+                    if (param === 'body') {
                         body = params[param];
                     } else {
-                        while (url.indexOf("<" + param + ">") >= 0) {
-                            if ( typeof params[param] == "object") {
-                                url = url.replace("<" + param + ">", JSON.stringify(params[param]));
+                        while (url.indexOf('<' + param + '>') >== 0) {
+                            if ( typeof params[param] === 'object') {
+                                url = url.replace('<' + param + '>', JSON.stringify(params[param]));
                             } else {
-                                url = url.replace("<" + param + ">", params[param]);
+                                url = url.replace('<' + param + '>', params[param]);
                             }
                         }
                     }
@@ -328,8 +333,8 @@ var main = function() {
             if (args.expects) {
                 // look for explicityly required parameters
                 args.expects.forEach(function(expectedParam) {
-                    if ((method == "POST" && params.body) ? !params.body[expectedParam] : !params[expectedParam]) {
-                        throw "RESTe :: missing parameter " + expectedParam + " for method " + args.name;
+                    if ((method === 'POST' && params.body) ? !params.body[expectedParam] : !params[expectedParam]) {
+                        throw 'RESTe :: missing parameter ' + expectedParam + ' for method ' + args.name;
                     }
                 });
 
@@ -362,7 +367,7 @@ var main = function() {
                 }
 
                 if (missing.length > 0) {
-                    throw "RESTe :: missing parameter/s " + missing + " for method " + args.name;
+                    throw 'RESTe :: missing parameter/s ' + missing + ' for method ' + args.name;
                 } else {
 
                     makeHttpRequest({
@@ -425,10 +430,10 @@ var main = function() {
             Alloy.Collections[name].reset(content);
             // and override fetch to trigger a change event
             Alloy.Collections[name].fetch = function() {
-                Alloy.Collections[name].trigger("change");
+                Alloy.Collections[name].trigger('change');
             };
         } else {
-            throw "No Array specified for createCollection";
+            throw 'No Array specified for createCollection';
         }
     };
 
@@ -468,7 +473,7 @@ var main = function() {
 
         // Intercept sync to handle collections / models
         Backbone.sync = function(method, model, options) {
-            log("Backbone.sync: " + method + " " + model._type);
+            log('Backbone.sync: ' + method + ' ' + model._type);
 
             var modelConfig = reste.modelConfig[model._type];
             var body,
@@ -495,7 +500,7 @@ var main = function() {
 
                             if (options.success)  options.success(response[collectionConfig.content]);
 
-                            Alloy.Collections[collectionConfig.name].trigger("sync");
+                            Alloy.Collections[collectionConfig.name].trigger('sync');
 
                         } else {
 
@@ -506,7 +511,7 @@ var main = function() {
 
                             if (options.success) options.success(response);
 
-                            Alloy.Collections[collectionConfig.name].trigger("sync");
+                            Alloy.Collections[collectionConfig.name].trigger('sync');
                         }
                   }
                 }, function(response) {
@@ -519,11 +524,11 @@ var main = function() {
 
             } else if ( model instanceof Backbone.Model) {
 
-                if (model.get("id") && method == "create") {
-                    method = "update";
+                if (model.get('id') && method === 'create') {
+                    method = 'update';
                 }
 
-                if (method == "update") {
+                if (method === 'update') {
                     params = {};
 
                     // if we're specifying attributes to changes
@@ -536,7 +541,7 @@ var main = function() {
                     }
 
                     // update!
-                    params[modelConfig.id] = model.get("id");
+                    params[modelConfig.id] = model.get('id');
 
                     params.body = params.body || model.toJSON();
 
@@ -564,14 +569,14 @@ var main = function() {
                     }, onError);
                 }
 
-                if (method == "read") {
+                if (method === 'read') {
 
                     if (modelConfig.read) {
 
                         if (model[modelConfig.id]) {
                             options[modelConfig.id] = model[modelConfig.id];
-                        } else if (model.get("id")) {
-                            options[modelConfig.id] = model.get("id");
+                        } else if (model.get('id')) {
+                            options[modelConfig.id] = model.get('id');
                         }
 
                         options.error ? onError = function(e) {
@@ -584,7 +589,7 @@ var main = function() {
 
                                 var results = e[modelConfig.content];
 
-                                if (results.length == 1) {
+                                if (results.length === 1) {
                                     options.success(results[0]);
                                 }
                             } else {
@@ -600,7 +605,7 @@ var main = function() {
                     }
                 }
 
-                if (method == "create") {
+                if (method === 'create') {
 
                     body = model.toJSON();
 
@@ -627,17 +632,17 @@ var main = function() {
                         } else {
                             // otherwise pass to success
                             e.id = e[modelConfig.id];
-                            model.set("id", e[modelConfig.id]);
+                            model.set('id', e[modelConfig.id]);
                             options.success(e);
                         }
                     }, onError);
                 }
 
-                if (method == "delete") {
+                if (method === 'delete') {
 
                     body = {};
 
-                    body[modelConfig.id] = model.get("id");
+                    body[modelConfig.id] = model.get('id');
                     body.body = model.toJSON();
 
                     // change to change the attributes before sending
