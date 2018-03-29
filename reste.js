@@ -72,7 +72,7 @@ var main = function() {
         }
 
         // debug the url
-        if (args.url.indexOf('http') >== 0) {
+        if (args.url.indexOf('http') >= 0) {
             log(args.url);
         } else {
             log((config.url ? config.url + args.url : args.url));
@@ -102,7 +102,7 @@ var main = function() {
         // open the url and check if we're overrding with
         // a local http based url
 
-        if (args.url.indexOf('http') >== 0) {
+        if (args.url.indexOf('http') >= 0) {
             http.open(args.method, args.url);
         } else {
             http.open(args.method, (config.url ? config.url + args.url : args.url));
@@ -134,7 +134,7 @@ var main = function() {
                 log('Setting local header - ' + header + ': ' + ( typeof args.headers[header] === 'function' ? args.headers[header]() : args.headers[header]));
             }
         }
-        
+
         // security manager (Pro / Enterprise)
         if (_.has(config, 'securityManager')) {
             http.setSecurityManager(config.securityManager);
@@ -302,7 +302,7 @@ var main = function() {
                     if (param === 'body') {
                         body = params[param];
                     } else {
-                        while (url.indexOf('<' + param + '>') >== 0) {
+                        while (url.indexOf('<' + param + '>') >= 0) {
                             if ( typeof params[param] === 'object') {
                                 url = url.replace('<' + param + '>', JSON.stringify(params[param]));
                             } else {
