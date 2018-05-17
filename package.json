@@ -22,7 +22,8 @@
     "appcelerator",
     "arrow",
     "rest",
-    "titanium"
+    "titanium",
+    "titanium-module"
   ],
   "author": "Jason Kneen",
   "license": "Apache 2.0",
