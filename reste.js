@@ -158,7 +158,7 @@ var main = function() {
 
             function retry() {
                 log('Retrying...');
-                makeHttpRequest(args, onLoad, onError);
+                return  makeHttpRequest(args, onLoad, onError);
             }
 
             var error;
@@ -226,7 +226,7 @@ var main = function() {
         } else {
             send();
         }
-
+        return http;
     }
 
     // set Requestheaders
@@ -338,7 +338,7 @@ var main = function() {
                     }
                 });
 
-                makeHttpRequest({
+                return  makeHttpRequest({
                     url : url,
                     method : method,
                     params : body,
@@ -370,7 +370,7 @@ var main = function() {
                     throw 'RESTe :: missing parameter/s ' + missing + ' for method ' + args.name;
                 } else {
 
-                    makeHttpRequest({
+                    return makeHttpRequest({
                         url : url,
                         method : method,
                         params : body,
