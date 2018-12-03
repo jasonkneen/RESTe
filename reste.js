@@ -587,10 +587,15 @@ var main = function() {
 
                             if (modelConfig.content) {
 
-                                var results = e[modelConfig.content];
+                                var result = e[modelConfig.content];
 
-                                if (results.length === 1) {
-                                    options.success(results[0]);
+                                if (result.length === 1) {
+                                    //result is an array with value as first entry
+                                    options.success(result[0]);
+                                }
+                                else {
+                                    //result is not an array
+                                    options.success(result);
                                 }
                             } else {
                                 // calls error handler if we have it defined and 201+ returned
