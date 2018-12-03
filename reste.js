@@ -302,6 +302,11 @@ var main = function() {
     reste.addMethod = function(args) {
         log(args.requestHeaders);
 
+        if (reste[args.name]) {
+            throw "RESTe :: method already defined and will be overwritten: " +
+                args.name;
+        }
+
         reste[args.name] = function(params, onLoad, onError) {
             var body,
                 method = "GET",
