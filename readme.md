@@ -462,13 +462,13 @@ Using the following config you can configure end points that will still work as 
         get: 'classes/locations?where={"name": "<name>"}'
     }, {
         name: "updateLocation",
-        put: "classes/locations/<objectId>"
+        put: "classes/locations/<id>"
     }, {
         name: "createLocation",
         post: "classes/locations/"
     }, {
         name: "deleteLocation",
-        delete: "classes/locations/<objectId>"
+        delete: "classes/locations/<id>"
     }]
 ```
 

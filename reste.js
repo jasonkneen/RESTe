@@ -158,7 +158,7 @@ var main = function() {
 
             function retry() {
                 log('Retrying...');
-                makeHttpRequest(args, onLoad, onError);
+                return  makeHttpRequest(args, onLoad, onError);
             }
 
             var error;
@@ -226,7 +226,7 @@ var main = function() {
         } else {
             send();
         }
-
+        return http;
     }
 
     // set Requestheaders
@@ -338,7 +338,7 @@ var main = function() {
                     }
                 });
 
-                makeHttpRequest({
+                return  makeHttpRequest({
                     url : url,
                     method : method,
                     params : body,
@@ -370,7 +370,7 @@ var main = function() {
                     throw 'RESTe :: missing parameter/s ' + missing + ' for method ' + args.name;
                 } else {
 
-                    makeHttpRequest({
+                    return makeHttpRequest({
                         url : url,
                         method : method,
                         params : body,
@@ -587,10 +587,15 @@ var main = function() {
 
                             if (modelConfig.content) {
 
-                                var results = e[modelConfig.content];
+                                var result = e[modelConfig.content];
 
-                                if (results.length === 1) {
-                                    options.success(results[0]);
+                                if (result.length === 1) {
+                                    //result is an array with value as first entry
+                                    options.success(result[0]);
+                                }
+                                else {
+                                    //result is not an array
+                                    options.success(result);
                                 }
                             } else {
                                 // calls error handler if we have it defined and 201+ returned
