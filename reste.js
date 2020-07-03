@@ -78,10 +78,10 @@ var main = function () {
 
     var formEncode = false;
 
-    http.setTimeout(config.timeout || 10000);
+    http.timeout = args.timeout || config.timeout || 10000;
 
     if (_.has(config, "validatesSecureCertificate")) {
-      http.setValidatesSecureCertificate(config.validatesSecureCertificate);
+      http.validatesSecureCertificate = config.validatesSecureCertificate
     }
 
     if (args.url.indexOf("http") >= 0) {
@@ -115,7 +115,7 @@ var main = function () {
     }
 
     if (_.has(config, "securityManager")) {
-      http.setSecurityManager(config.securityManager);
+      http.securityManager = config.securityManager;
     }
 
     http.onload = function (e) {
@@ -293,6 +293,7 @@ var main = function () {
         return makeHttpRequest({
           url: url,
           method: method,
+          timeout: args.timeout || config.timeout || 10000,
           params: body,
           headers: args.requestHeaders || args.headers,
           beforePost: args.beforePost,
@@ -318,6 +319,7 @@ var main = function () {
           return makeHttpRequest({
             url: url,
             method: method,
+            timeout: args.timeout || config.timeout || 10000,
             params: body,
             headers: args.requestHeaders || args.headers,
             beforePost: args.beforePost,
