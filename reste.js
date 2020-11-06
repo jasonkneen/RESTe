@@ -2,7 +2,7 @@ var main = function () {
   var reste = this;
 
   var config = {},
-      requestHeaders = [];
+    requestHeaders = [];
 
   function log(message) {
     if (config.debug && message) {
@@ -199,7 +199,8 @@ var main = function () {
     for (var header in headers) {
       requestHeaders.push({
         name: header,
-        value: headers[header] });
+        value: headers[header]
+      });
     }
   };
 
@@ -215,7 +216,8 @@ var main = function () {
     if (!changed) {
       requestHeaders.push({
         name: Object.keys(header)[0],
-        value: header[Object.keys(header)[0]] });
+        value: header[Object.keys(header)[0]]
+      });
     }
   };
 
@@ -234,9 +236,9 @@ var main = function () {
 
     reste[args.name] = function (params, onLoad, onError) {
       var body,
-          method = "GET",
-          url,
-          deferred;
+        method = "GET",
+        url,
+        deferred;
 
       if (args.post) method = "POST";
       if (args.get) method = "GET";
@@ -296,11 +298,12 @@ var main = function () {
           params: body,
           headers: args.requestHeaders || args.headers,
           beforePost: args.beforePost,
-          beforeSend: args.beforeSend }, onLoad, onError);
+          beforeSend: args.beforeSend
+        }, onLoad, onError);
       } else {
         var m,
-            missing = [],
-            re = /(\<\w*\>)/g;
+          missing = [],
+          re = /(\<\w*\>)/g;
 
         if (config.autoValidateParams) {
           while ((m = re.exec(url)) !== null) {
@@ -321,7 +324,8 @@ var main = function () {
             params: body,
             headers: args.requestHeaders || args.headers,
             beforePost: args.beforePost,
-            beforeSend: args.beforeSend }, onLoad, onError);
+            beforeSend: args.beforeSend
+          }, onLoad, onError);
         }
       }
 
@@ -392,7 +396,8 @@ var main = function () {
             this.__transform = this.toJSON();
           }
           return this.__transform;
-        } });
+        }
+      });
 
       if (args.collections) {
         args.collections.forEach(function (collection) {
@@ -412,7 +417,8 @@ var main = function () {
 
       if (model instanceof Backbone.Collection && modelConfig && modelConfig.collections) {
         var collectionConfig = _.where(modelConfig.collections, {
-          name: model._name })[0];
+          name: model._name
+        })[0];
 
         var methodCall = reste[collectionConfig.read];
 
@@ -527,7 +533,8 @@ var main = function () {
           } : onError = null;
 
           reste[modelConfig.create]({
-            body: body }, function (e) {
+            body: body
+          }, function (e) {
 
             if (e.code > 200) {
               onError(e);
