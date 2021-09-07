@@ -71,9 +71,16 @@ The main things I wanted to achieve were:-
 
 ## Quick Start
 
-* [Install from NPM the latest version](https://www.npmjs.com/package/reste)
+(If your Titanium app does not use node modules already, follow the guide here )
+
+[Using NPM Packages in Titanium](https://blog.axway.com/mobile-apps/using-npm-packages-in-titanium)
+
+* [Install from NPM the latest version within your app/lib folder](https://www.npmjs.com/package/reste)
 or
 * [Download the latest version](https://github.com/jasonkneen/reste) and place in your project (lib folder for Alloy).
+
+
+
 
 Ideally you should put your RESTe config in alloy.js OR in an app/lib file that is called from alloy.js or *before* you intend to use any colletions / models:-
 

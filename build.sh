@@ -1,1 +1,0 @@
-titaniumifier --out dist

@@ -1,15 +1,12 @@
 {
   "name": "reste",
-  "version": "1.5.6",
+  "version": "1.5.8",
   "description": "A JavaScript REST / API helper for Titanium with Alloy Models/Collections support",
   "titaniumManifest": {
     "guid": "afafe8b0-b93b-771c-a9e5-4e71db81b9ff"
   },
   "main": "reste.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "node ./appc-npm"
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/jasonkneen/RESTe.git"
@@ -26,32 +23,11 @@
     "titanium-module"
   ],
   "author": "Jason Kneen",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/jasonkneen/RESTe/issues"
   },
   "homepage": "https://github.com/jasonkneen/RESTe",
   "dependencies": {},
-  "devDependencies": {
-    "grunt": "^0.4.5",
-    "grunt-titaniumifier": "^1.1.0"
-  },
-  "appc-npm": {
-    "target": {
-      "alloy": "app/lib/",
-      "titanium": "Resources/",
-      "arrow": "lib/"
-    },
-    "ignore": [
-      ".DS_Store",
-      ".git",
-      ".gitignore",
-      "dist",
-      "node_modules",
-      "package.json",
-      "package.json",
-      "publish.sh",
-      "readme.md"
-    ]
-  }
+  "devDependencies": {}
 }
