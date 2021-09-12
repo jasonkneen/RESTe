@@ -81,7 +81,7 @@ var main = function () {
     http.timeout = args.timeout || config.timeout || 10000;
 
     if (_.has(config, "validatesSecureCertificate")) {
-      http.validatesSecureCertificate = config.validatesSecureCertificate
+      http.validatesSecureCertificate = config.validatesSecureCertificate;
     }
 
     if (args.url.indexOf("http") >= 0) {
