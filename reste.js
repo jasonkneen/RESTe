@@ -1,18 +1,17 @@
-var main = function () {
+function main() {
   var reste = this;
-
-  var config = {},
-  requestHeaders = [];
+  var config = {};
+  var requestHeaders = [];
 
   function log(message) {
     if (config.debug && message) {
-      console.log("::RESTE::" + message);
+      console.log('::RESTE::' + message);
     }
   }
 
   function warn(message) {
     if (config.debug && message) {
-      console.warn("::RESTE::" + message);
+      console.warn('::RESTE::' + message);
     }
   }
 
@@ -21,14 +20,14 @@ var main = function () {
 
     reste.setRequestHeaders(config.requestHeaders);
 
-    config.methods.forEach(function (method) {
+    config.methods.forEach((method) => {
       reste.addMethod(method);
     });
 
     if (config.models) {
       initModels();
 
-      config.models.forEach(function (model) {
+      config.models.forEach((model) => {
         reste.addModel(model);
       });
     }
@@ -60,7 +59,7 @@ var main = function () {
       }
     }
 
-    if (args.url.indexOf("http") >= 0) {
+    if (args.url.indexOf('http') == 0) {
       log(args.url);
     } else {
       log(config.url ? config.url + args.url : args.url);
@@ -80,45 +79,45 @@ var main = function () {
 
     http.timeout = args.timeout || config.timeout || 10000;
 
-    if (_.has(config, "validatesSecureCertificate")) {
+    if (_.has(config, 'validatesSecureCertificate')) {
       http.validatesSecureCertificate = config.validatesSecureCertificate;
     }
 
-    if (args.url.indexOf("http") >= 0) {
+    if (args.url.indexOf('http') == 0) {
       http.open(args.method, args.url);
     } else {
       http.open(args.method, config.url ? config.url + args.url : args.url);
     }
 
-    requestHeaders.forEach(function (header) {
-      if (header.name === "Content-Type" && header.value === "application/x-www-form-urlencoded") {
+    requestHeaders.forEach((header) => {
+      if (header.name === 'Content-Type' && header.value === 'application/x-www-form-urlencoded') {
         formEncode = true;
       }
 
-      http.setRequestHeader(header.name, typeof header.value === "function" ? header.value() : header.value);
+      http.setRequestHeader(header.name, typeof header.value === 'function' ? header.value() : header.value);
 
-      log("Setting global header - " + header.name + ": " + (typeof header.value === "function" ? header.value() : header.value));
+      log('Setting global header - ' + header.name + ': ' + (typeof header.value === 'function' ? header.value() : header.value));
     });
 
     if (args.headers) {
       for (var header in args.headers) {
-        if (header === "Content-Type" && args.headers[header] === "application/x-www-form-urlencoded") {
+        if (header === 'Content-Type' && args.headers[header] === 'application/x-www-form-urlencoded') {
           formEncode = true;
-        } else if (header === "Content-Type" && args.headers[header] === "application/json") {
+        } else if (header === 'Content-Type' && args.headers[header] === 'application/json') {
           formEncode = false;
         }
 
-        http.setRequestHeader(header, typeof args.headers[header] === "function" ? args.headers[header]() : args.headers[header]);
+        http.setRequestHeader(header, typeof args.headers[header] === 'function' ? args.headers[header]() : args.headers[header]);
 
-        log("Setting local header - " + header + ": " + (typeof args.headers[header] === "function" ? args.headers[header]() : args.headers[header]));
+        log('Setting local header - ' + header + ': ' + (typeof args.headers[header] === 'function' ? args.headers[header]() : args.headers[header]));
       }
     }
 
-    if (_.has(config, "securityManager")) {
+    if (_.has(config, 'securityManager')) {
       http.securityManager = config.securityManager;
     }
 
-    http.onload = function (e) {
+    http.onload = function () {
       var response = parseJSON(http.responseText);
 
       if (config.onLoad) {
@@ -132,7 +131,7 @@ var main = function () {
       e.url = args.url;
 
       function retry() {
-        log("Retrying...");
+        log('Retrying...');
         return makeHttpRequest(args, onLoad, onError);
       }
 
@@ -141,10 +140,10 @@ var main = function () {
       if (config.errorsAsObjects) {
         error = e;
         error.content = parseJSON(http.responseText);
-        warn("Errors will be returned as objects.");
+        warn('Errors will be returned as objects.');
       } else {
         error = parseJSON(http.responseText);
-        warn("Future versions of RESTe will return errors as objects. Use config.errorsAsObjects = true to support this now and update your apps!");
+        warn('Future versions of RESTe will return errors as objects. Use config.errorsAsObjects = true to support this now and update your apps!');
       }
 
       if (onError) {
@@ -154,14 +153,14 @@ var main = function () {
       } else if (onLoad) {
         onLoad(error, retry);
       } else {
-        throw "RESTe :: No error handler / callback for: " + args.url;
+        throw 'RESTe :: No error handler / callback for: ' + args.url;
       }
     };
 
     function send() {
       log(args.params);
 
-      if (args.params && (args.method === "POST" || args.method === "PUT")) {
+      if (args.params && (args.method === 'POST' || args.method === 'PUT')) {
         if (formEncode) {
           http.send(args.params);
         } else {
@@ -177,14 +176,14 @@ var main = function () {
     var beforePost = args.beforePost || config.beforePost;
     var beforeSend = args.beforeSend || config.beforeSend;
 
-    if (args.method === "POST" && typeof beforePost === "function") {
+    if (args.method === 'POST' && typeof beforePost === 'function') {
 
-      beforePost(args.params, function (e) {
+      beforePost(args.params, (e) => {
         args.params = e;
         send();
       });
-    } else if (typeof beforeSend === "function") {
-      beforeSend(args.params, function (e) {
+    } else if (typeof beforeSend === 'function') {
+      beforeSend(args.params, (e) => {
         args.params = e;
         send();
       });
@@ -199,7 +198,8 @@ var main = function () {
     for (var header in headers) {
       requestHeaders.push({
         name: header,
-        value: headers[header] });
+        value: headers[header]
+      });
 
     }
   };
@@ -207,7 +207,7 @@ var main = function () {
   reste.changeRequestHeader = function (header) {
     var changed = false;
 
-    _.each(requestHeaders, function (item) {
+    _.each(requestHeaders, (item) => {
       if (item.name === Object.keys(header)[0]) {
         item.value = header[Object.keys(header)[0]];
         changed = true;
@@ -216,13 +216,14 @@ var main = function () {
     if (!changed) {
       requestHeaders.push({
         name: Object.keys(header)[0],
-        value: header[Object.keys(header)[0]] });
+        value: header[Object.keys(header)[0]]
+      });
 
     }
   };
 
   reste.removeRequestHeaderItem = function (delItem) {
-    requestHeaders = _.filter(requestHeaders, function (item) {
+    requestHeaders = _.filter(requestHeaders, (item) => {
       return !(item.name === delItem);
     });
   };
@@ -231,40 +232,40 @@ var main = function () {
     log(args.requestHeaders);
 
     if (reste[args.name]) {
-      throw "RESTe :: method already defined and will be overwritten: " + args.name;
+      throw 'RESTe :: method already defined and will be overwritten: ' + args.name;
     }
 
     reste[args.name] = function (params, onLoad, onError) {
-      var body,
-      method = "GET",
-      url,
-      deferred;
+      var body;
+      var method = 'GET';
+      var url;
+      var deferred;
 
-      if (args.post) method = "POST";
-      if (args.get) method = "GET";
-      if (args.put) method = "PUT";
-      if (args.delete) method = "DELETE";
+      if (args.post) method = 'POST';
+      if (args.get) method = 'GET';
+      if (args.put) method = 'PUT';
+      if (args.delete) method = 'DELETE';
 
       url = args[method.toLowerCase()] || args.get;
 
-      if (config.Q && !onLoad && typeof params != "function") {
+      if (config.Q && !onLoad && typeof params !== 'function') {
         deferred = config.Q.defer();
         onLoad = deferred.resolve;
         onError = deferred.reject;
       }
 
-      if (!onLoad && typeof params === "function") {
+      if (!onLoad && typeof params === 'function') {
         onLoad = params;
       } else {
         for (var param in params) {
-          if (param === "body") {
+          if (param === 'body') {
             body = params[param];
           } else {
-            while (url.indexOf("<" + param + ">") >= 0) {
-              if (typeof params[param] === "object") {
-                url = url.replace("<" + param + ">", JSON.stringify(params[param]));
+            while (url.indexOf('<' + param + '>') >= 0) {
+              if (typeof params[param] === 'object') {
+                url = url.replace('<' + param + '>', JSON.stringify(params[param]));
               } else {
-                url = url.replace("<" + param + ">", params[param]);
+                url = url.replace('<' + param + '>', params[param]);
               }
             }
           }
@@ -286,25 +287,27 @@ var main = function () {
       }
 
       if (args.expects) {
-        args.expects.forEach(function (expectedParam) {
-          if (method === "POST" && params.body ? !params.body[expectedParam] : !params[expectedParam]) {
-            throw "RESTe :: missing parameter " + expectedParam + " for method " + args.name;
+        args.expects.forEach((expectedParam) => {
+          if (method === 'POST' && params.body ? !params.body[expectedParam] : !params[expectedParam]) {
+            throw 'RESTe :: missing parameter ' + expectedParam + ' for method ' + args.name;
           }
         });
 
         return makeHttpRequest({
-          url: url,
-          method: method,
-          timeout: args.timeout || config.timeout || 10000,
-          params: body,
-          headers: args.requestHeaders || args.headers,
-          beforePost: args.beforePost,
-          beforeSend: args.beforeSend },
-        onLoad, onError);
+            url,
+            method,
+            timeout: args.timeout || config.timeout || 10000,
+            params: body,
+            headers: args.requestHeaders || args.headers,
+            beforePost: args.beforePost,
+            beforeSend: args.beforeSend
+          },
+
+          onLoad, onError);
       } else {
-        var m,
-        missing = [],
-        re = /(\<\w*\>)/g;
+        var m;
+        var missing = [];
+        var re = /(\<\w*\>)/g;
 
         if (config.autoValidateParams) {
           while ((m = re.exec(url)) !== null) {
@@ -317,17 +320,19 @@ var main = function () {
         }
 
         if (missing.length > 0) {
-          throw "RESTe :: missing parameter/s " + missing + " for method " + args.name;
+          throw 'RESTe :: missing parameter/s ' + missing + ' for method ' + args.name;
         } else {
           return makeHttpRequest({
-            url: url,
-            method: method,
-            timeout: args.timeout || config.timeout || 10000,
-            params: body,
-            headers: args.requestHeaders || args.headers,
-            beforePost: args.beforePost,
-            beforeSend: args.beforeSend },
-          onLoad, onError);
+              url,
+              method,
+              timeout: args.timeout || config.timeout || 10000,
+              params: body,
+              headers: args.requestHeaders || args.headers,
+              beforePost: args.beforePost,
+              beforeSend: args.beforeSend
+            },
+
+            onLoad, onError);
         }
       }
 
@@ -341,7 +346,8 @@ var main = function () {
     var model = new Backbone.Model(attributes);
 
     if (reste.modelConfig && reste.modelConfig[name] && reste.modelConfig[name].transform) {
-      model.transform = function (model, transform) {
+      // eslint-disable-next-line no-unused-vars
+      model.transform = function (_model, transform) {
         if (transform) {
           this.__transform = transform(this);
         } else {
@@ -350,7 +356,8 @@ var main = function () {
         return this.__transform;
       };
     } else {
-      model.transform = function (model, transform) {
+      // eslint-disable-next-line no-unused-vars
+      model.transform = function (_model, transform) {
         if (transform) {
           this.__transform = transform(this);
         } else {
@@ -373,10 +380,10 @@ var main = function () {
       Alloy.Collections[name].reset(content);
 
       Alloy.Collections[name].fetch = function () {
-        Alloy.Collections[name].trigger("change");
+        Alloy.Collections[name].trigger('change');
       };
     } else {
-      throw "No Array specified for createCollection";
+      throw 'No Array specified for createCollection';
     }
   };
 
@@ -389,7 +396,8 @@ var main = function () {
       var model = Backbone.Model.extend({
         _type: args.name,
         _method: args.name,
-        transform: function (model, transform) {
+        // eslint-disable-next-line no-unused-vars
+        transform(_model, transform) {
           if (transform) {
             this.__transform = transform(this);
           } else if (args.transform) {
@@ -398,11 +406,11 @@ var main = function () {
             this.__transform = this.toJSON();
           }
           return this.__transform;
-        } });
-
+        }
+      });
 
       if (args.collections) {
-        args.collections.forEach(function (collection) {
+        args.collections.forEach((collection) => {
           Alloy.Collections[collection.name] = Alloy.Collections[collection.name] || new Backbone.Collection();
           Alloy.Collections[collection.name]._type = args.name;
           Alloy.Collections[collection.name]._name = collection.name;
@@ -412,50 +420,51 @@ var main = function () {
     };
 
     Backbone.sync = function (method, model, options) {
-      log("Backbone.sync: " + method + " " + model._type);
+      log('Backbone.sync: ' + method + ' ' + model._type);
 
       var modelConfig = reste.modelConfig[model._type];
-      var body, onError;
+      var body;
+      var onError;
 
       if (model instanceof Backbone.Collection && modelConfig && modelConfig.collections) {
         var collectionConfig = _.where(modelConfig.collections, {
-          name: model._name })[
-        0];
+          name: model._name
+        })[0];
 
         var methodCall = reste[collectionConfig.read];
 
-        methodCall(options, function (response) {
-          if (response != null && response != undefined) {
+        methodCall(options, (response) => {
+          if (response !== null && response !== undefined) {
             if (response[collectionConfig.content]) {
-              response[collectionConfig.content].forEach(function (item) {
+              response[collectionConfig.content].forEach((item) => {
                 item.id = item[modelConfig.id];
               });
 
               if (options.success) options.success(response[collectionConfig.content]);
 
-              Alloy.Collections[collectionConfig.name].trigger("sync");
+              Alloy.Collections[collectionConfig.name].trigger('sync');
             } else {
-              response.forEach(function (item) {
+              response.forEach((item) => {
                 item.id = item[modelConfig.id];
               });
 
               if (options.success) options.success(response);
 
-              Alloy.Collections[collectionConfig.name].trigger("sync");
+              Alloy.Collections[collectionConfig.name].trigger('sync');
             }
           }
-        }, function (response) {
+        }, (response) => {
           if (options.error) {
             options.error(response);
           }
         });
       } else if (model instanceof Backbone.Model) {
-        if (model.get("id") && method === "create") {
-          method = "update";
+        if (model.get('id') && method === 'create') {
+          method = 'update';
         }
 
-        if (method === "update") {
-          params = {};
+        if (method === 'update') {
+          var params = {};
 
           if (options.changes) {
             params.body = {};
@@ -464,7 +473,7 @@ var main = function () {
             }
           }
 
-          params[modelConfig.id] = model.get("id");
+          params[modelConfig.id] = model.get('id');
 
           params.body = params.body || model.toJSON();
 
@@ -479,7 +488,7 @@ var main = function () {
             options.error(e);
           } : onError = null;
 
-          reste[modelConfig.update](params, function (e) {
+          reste[modelConfig.update](params, (e) => {
             if (e.code > 200) {
               onError(e);
             } else {
@@ -488,19 +497,19 @@ var main = function () {
           }, onError);
         }
 
-        if (method === "read") {
+        if (method === 'read') {
           if (modelConfig.read) {
             if (model[modelConfig.id]) {
               options[modelConfig.id] = model[modelConfig.id];
-            } else if (model.get("id")) {
-              options[modelConfig.id] = model.get("id");
+            } else if (model.get('id')) {
+              options[modelConfig.id] = model.get('id');
             }
 
             options.error ? onError = function (e) {
               options.error(e);
             } : onError = null;
 
-            reste[modelConfig.read](options, function (e) {
+            reste[modelConfig.read](options, (e) => {
               if (modelConfig.content) {
                 var result = e[modelConfig.content];
 
@@ -509,18 +518,16 @@ var main = function () {
                 } else {
                   options.success(result);
                 }
+              } else if (e.code > 200) {
+                onError(e);
               } else {
-                if (e.code > 200) {
-                  onError(e);
-                } else {
-                  options.success(e);
-                }
+                options.success(e);
               }
             }, onError);
           }
         }
 
-        if (method === "create") {
+        if (method === 'create') {
           body = model.toJSON();
 
           delete body.id;
@@ -535,23 +542,25 @@ var main = function () {
           } : onError = null;
 
           reste[modelConfig.create]({
-            body: body },
-          function (e) {
+              body
+            },
 
-            if (e.code > 200) {
-              onError(e);
-            } else {
-              e.id = e[modelConfig.id];
-              model.set("id", e[modelConfig.id]);
-              options.success(e);
-            }
-          }, onError);
+            (e) => {
+
+              if (e.code > 200) {
+                onError(e);
+              } else {
+                e.id = e[modelConfig.id];
+                model.set('id', e[modelConfig.id]);
+                options.success(e);
+              }
+            }, onError);
         }
 
-        if (method === "delete") {
+        if (method === 'delete') {
           body = {};
 
-          body[modelConfig.id] = model.get("id");
+          body[modelConfig.id] = model.get('id');
           body.body = model.toJSON();
 
           if (modelConfig.beforeCreate) {
@@ -562,7 +571,7 @@ var main = function () {
             options.error(e);
           } : onError = null;
 
-          reste[modelConfig.delete](body, function (e) {
+          reste[modelConfig.delete](body, (e) => {
             if (e.code > 200) {
               onError(e);
             } else {
@@ -575,6 +584,6 @@ var main = function () {
   }
 
   return reste;
-};
+}
 
 module.exports = main;
