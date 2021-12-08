@@ -160,7 +160,7 @@ function main() {
     function send() {
       log(args.params);
 
-      if (args.params && (args.method === 'POST' || args.method === 'PUT')) {
+      if (args.params && (args.method === 'POST' || args.method === 'PUT' || args.method === 'PATCH' || args.method === 'DELETE')) {
         if (formEncode) {
           http.send(args.params);
         } else {
@@ -198,8 +198,8 @@ function main() {
     for (var header in headers) {
       requestHeaders.push({
         name: header,
-        value: headers[header]
-      });
+        value: headers[header] });
+
 
     }
   };
@@ -216,8 +216,8 @@ function main() {
     if (!changed) {
       requestHeaders.push({
         name: Object.keys(header)[0],
-        value: header[Object.keys(header)[0]]
-      });
+        value: header[Object.keys(header)[0]] });
+
 
     }
   };
@@ -244,6 +244,7 @@ function main() {
       if (args.post) method = 'POST';
       if (args.get) method = 'GET';
       if (args.put) method = 'PUT';
+      if (args.patch) method = 'PATCH';
       if (args.delete) method = 'DELETE';
 
       url = args[method.toLowerCase()] || args.get;
@@ -288,22 +289,22 @@ function main() {
 
       if (args.expects) {
         args.expects.forEach((expectedParam) => {
-          if (method === 'POST' && params.body ? !params.body[expectedParam] : !params[expectedParam]) {
+          if (params.body ? !params.body[expectedParam] : !params[expectedParam]) {
             throw 'RESTe :: missing parameter ' + expectedParam + ' for method ' + args.name;
           }
         });
 
         return makeHttpRequest({
-            url,
-            method,
-            timeout: args.timeout || config.timeout || 10000,
-            params: body,
-            headers: args.requestHeaders || args.headers,
-            beforePost: args.beforePost,
-            beforeSend: args.beforeSend
-          },
+          url,
+          method,
+          timeout: args.timeout || config.timeout || 10000,
+          params: body,
+          headers: args.requestHeaders || args.headers,
+          beforePost: args.beforePost,
+          beforeSend: args.beforeSend },
 
-          onLoad, onError);
+
+        onLoad, onError);
       } else {
         var m;
         var missing = [];
@@ -323,16 +324,16 @@ function main() {
           throw 'RESTe :: missing parameter/s ' + missing + ' for method ' + args.name;
         } else {
           return makeHttpRequest({
-              url,
-              method,
-              timeout: args.timeout || config.timeout || 10000,
-              params: body,
-              headers: args.requestHeaders || args.headers,
-              beforePost: args.beforePost,
-              beforeSend: args.beforeSend
-            },
+            url,
+            method,
+            timeout: args.timeout || config.timeout || 10000,
+            params: body,
+            headers: args.requestHeaders || args.headers,
+            beforePost: args.beforePost,
+            beforeSend: args.beforeSend },
 
-            onLoad, onError);
+
+          onLoad, onError);
         }
       }
 
@@ -406,8 +407,8 @@ function main() {
             this.__transform = this.toJSON();
           }
           return this.__transform;
-        }
-      });
+        } });
+
 
       if (args.collections) {
         args.collections.forEach((collection) => {
@@ -428,8 +429,9 @@ function main() {
 
       if (model instanceof Backbone.Collection && modelConfig && modelConfig.collections) {
         var collectionConfig = _.where(modelConfig.collections, {
-          name: model._name
-        })[0];
+          name: model._name })[
+
+        0];
 
         var methodCall = reste[collectionConfig.read];
 
@@ -542,24 +544,23 @@ function main() {
           } : onError = null;
 
           reste[modelConfig.create]({
-              body
-            },
+            body },
 
-            (e) => {
 
-              if (e.code > 200) {
-                onError(e);
-              } else {
-                e.id = e[modelConfig.id];
-                model.set('id', e[modelConfig.id]);
-                options.success(e);
-              }
-            }, onError);
+          (e) => {
+
+            if (e.code > 200) {
+              onError(e);
+            } else {
+              e.id = e[modelConfig.id];
+              model.set('id', e[modelConfig.id]);
+              options.success(e);
+            }
+          }, onError);
         }
 
         if (method === 'delete') {
           body = {};
-
           body[modelConfig.id] = model.get('id');
           body.body = model.toJSON();
 
