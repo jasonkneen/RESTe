@@ -200,7 +200,6 @@ function main() {
         name: header,
         value: headers[header] });
 
-
     }
   };
 
@@ -217,7 +216,6 @@ function main() {
       requestHeaders.push({
         name: Object.keys(header)[0],
         value: header[Object.keys(header)[0]] });
-
 
     }
   };
@@ -303,7 +301,6 @@ function main() {
           beforePost: args.beforePost,
           beforeSend: args.beforeSend },
 
-
         onLoad, onError);
       } else {
         var m;
@@ -331,7 +328,6 @@ function main() {
             headers: args.requestHeaders || args.headers,
             beforePost: args.beforePost,
             beforeSend: args.beforeSend },
-
 
           onLoad, onError);
         }
@@ -408,7 +404,6 @@ function main() {
           }
           return this.__transform;
         } });
-
 
       if (args.collections) {
         args.collections.forEach((collection) => {
@@ -545,7 +540,6 @@ function main() {
 
           reste[modelConfig.create]({
             body },
-
 
           (e) => {
 
