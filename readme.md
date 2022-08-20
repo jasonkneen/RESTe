@@ -150,8 +150,8 @@ This one is quite useful if you need to change the parameters which are going to
 {
     ...
     beforePost: function(params, callback) {
-	params.something = 'else';
-        callback(params);
+      params.something = 'else';
+      callback(params);
     },
     ...
 }
@@ -166,18 +166,18 @@ These are similar to beforeSend but works for all requests (GET, PUT, DELETE, PO
 {
     ...
     beforeSend: function(data, callback) {
-	if (Ti.Network.online) {
-	    callback(data);
-	} else {
-	    alert("No internet connection!");
-      callback({
-        skip: true,
-        error: "no_internet"
-      });
-      // will call your success method and pass `error:no_internet` to it
-	}
-    },
-    ...
+      if (Ti.Network.online) {
+        callback(data);
+       } else {
+         alert("No internet connection!");
+         callback({
+           skip: true,
+           error: "no_internet"
+         });
+         // will call your success method and pass `error:no_internet` to it
+       }
+     },
+     ...
 }
 ```
 ### Errors
@@ -283,13 +283,13 @@ Here's a **PUT** request example, passing an id (you'd need to ensure you have a
 
 ```javascript
 api.updateVideo({
-	objectId: "123",
-	body: {
-		categoryId: 2,
-		name: "My Video2"
-	}
+  objectId: "123",
+  body: {
+    categoryId: 2,
+    name: "My Video2"
+  }
 }, function(video) {
-	// do stuff with the video
+  // do stuff with the video
 });
 ```
 
