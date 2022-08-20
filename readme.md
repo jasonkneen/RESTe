@@ -141,11 +141,11 @@ api.config({
 
 A couple of useful hooks or events can be used within your RESTe global configuration. Those hooks will happen before specific calls are made. They will be executed before any request is sent allowing you to a) change the parameters or b) stop the call happening.
 
-beforePost:
+#### beforePost:
 
 This one is quite useful if you need to change the parameters which are going to be used for the request. You might for example -- if you're using Parse Server -- want to strip out certain parameters from models before sending them.
 
-Example:
+**Example:**
 ```javascript
 {
     ...
@@ -156,11 +156,12 @@ Example:
     ...
 }
 ```
-beforeSend:
 
-These are similar to beforeSend but works for all requests (GET, PUT, DELETE, POST). If you specify both beforePost and beforeLoad then beforePost will go first, then beforeSend.
+#### beforeSend:
 
-Example:
+These are similar to beforeSend but works for all requests (GET, PUT, DELETE, POST). If you specify both `beforePost` and `beforeLoad` then `beforePost` will go first, then `beforeSend`. Inside `beforeSend` or `beforePost` you can call the `callback()` method with `skip:true` so it will still fire your `success` callback but _without_ making the API call. Use this e.g. to load offline fallback data inside your `success` method:
+
+**Example:**
 ```javascript
 {
     ...
@@ -169,6 +170,11 @@ Example:
 	    callback(data);
 	} else {
 	    alert("No internet connection!");
+      callback({
+        skip: true,
+        error: "no_internet"
+      });
+      // will call your success method and pass `error:no_internet` to it
 	}
     },
     ...
