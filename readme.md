@@ -158,7 +158,7 @@ Example:
 ```
 beforeSend:
 
-These are similar to beforeSend but works for all requests (GET, PUT, DELETE, POST). If you specify both beforePost and beforeLoad then beforePost will go first, then beforeSend.
+This is similar to beforePost but works for all requests (GET, PUT, DELETE, POST). If you specify both beforePost and beforeSend then beforePost will go first, then beforeSend.
 
 Example:
 ```javascript
