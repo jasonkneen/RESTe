@@ -158,8 +158,7 @@ This one is quite useful if you need to change the parameters which are going to
 ```
 
 #### beforeSend:
-
-These are similar to beforeSend but works for all requests (GET, PUT, DELETE, POST). If you specify both `beforePost` and `beforeLoad` then `beforePost` will go first, then `beforeSend`. Inside `beforeSend` or `beforePost` you can call the `callback()` method with `skip:true` so it will still fire your `success` callback but _without_ making the API call. Use this e.g. to load offline fallback data inside your `success` method:
+This is similar to beforePost but works for all requests (GET, PUT, DELETE, POST). If you specify both beforePost and beforeSend then beforePost will go first, then beforeSend.
 
 **Example:**
 ```javascript
