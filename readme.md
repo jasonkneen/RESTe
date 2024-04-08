@@ -141,37 +141,42 @@ api.config({
 
 A couple of useful hooks or events can be used within your RESTe global configuration. Those hooks will happen before specific calls are made. They will be executed before any request is sent allowing you to a) change the parameters or b) stop the call happening.
 
-beforePost:
+#### beforePost:
 
 This one is quite useful if you need to change the parameters which are going to be used for the request. You might for example -- if you're using Parse Server -- want to strip out certain parameters from models before sending them.
 
-Example:
+**Example:**
 ```javascript
 {
     ...
     beforePost: function(params, callback) {
-	params.something = 'else';
-        callback(params);
+      params.something = 'else';
+      callback(params);
     },
     ...
 }
 ```
-beforeSend:
 
+#### beforeSend:
 This is similar to beforePost but works for all requests (GET, PUT, DELETE, POST). If you specify both beforePost and beforeSend then beforePost will go first, then beforeSend.
 
-Example:
+**Example:**
 ```javascript
 {
     ...
     beforeSend: function(data, callback) {
-	if (Ti.Network.online) {
-	    callback(data);
-	} else {
-	    alert("No internet connection!");
-	}
-    },
-    ...
+      if (Ti.Network.online) {
+        callback(data);
+       } else {
+         alert("No internet connection!");
+         callback({
+           skip: true,
+           error: "no_internet"
+         });
+         // will call your success method and pass `error:no_internet` to it
+       }
+     },
+     ...
 }
 ```
 ### Errors
@@ -277,13 +282,13 @@ Here's a **PUT** request example, passing an id (you'd need to ensure you have a
 
 ```javascript
 api.updateVideo({
-	objectId: "123",
-	body: {
-		categoryId: 2,
-		name: "My Video2"
-	}
+  objectId: "123",
+  body: {
+    categoryId: 2,
+    name: "My Video2"
+  }
 }, function(video) {
-	// do stuff with the video
+  // do stuff with the video
 });
 ```
 

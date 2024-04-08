@@ -179,11 +179,19 @@ function main() {
     if (args.method === 'POST' && typeof beforePost === 'function') {
 
       beforePost(args.params, (e) => {
+        if (e.skip) {
+            onLoad(e);
+            return;
+        }
         args.params = e;
         send();
       });
     } else if (typeof beforeSend === 'function') {
       beforeSend(args.params, (e) => {
+        if (e.skip) {
+            onLoad(e);
+            return;
+        }
         args.params = e;
         send();
       });
