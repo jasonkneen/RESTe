@@ -395,11 +395,11 @@ The following will clear any cookies from the baseUrl:
 api.clearCookies();
 ```
 
-## Alloy Collections and Model support
+## Collections and Model support
 
 RESTe supports collection and model generation. So it supports creating and managing collections and models, binding, and CRUD methods to Create, Update and Delete models.
 
-**NOTE**: If you are using the Alloy Collections and Model Support of RESTe, you should **not** use the Alloy Model / Collection definitions -- so you shouldn't have an app/models folder with models defined. You must also **not** use the <Collection src="etc"/> notation in the XML -- you *just* use the dataCollection binding in a repeating element.
+**NOTE**: If you are using the Collections and Model Support of RESTe, you should **not** use the Alloy Model / Collection definitions -- so you shouldn't have an app/models folder with models defined. You must also **not** use the <Collection src="etc"/> notation in the XML -- you *just* use the dataCollection binding in a repeating element.
 
 You can also now perform transform functions at a global (config) level or locally in a controller / view -- this is really useful if you use Alloy and pass models to views using **$model**
 
@@ -440,7 +440,7 @@ You can also pass an optional transform parameter in the transform function, whi
 
 ### Defining methods with models / collections
 
-Using the following config you can configure end points that will still work as normal RESTe methods, but also give you collections and model support for (C)reate, (R)ead, (U)pdate, (D)elete. For Collections I use an array of collections so you can have multiple endpoints configured if different collections using the same model. This enables use of for example, Alloy.Collections.locations (for all locations) and Alloy.Collections.locationsByName (for locations by a specific parameter).
+Using the following config you can configure end points that will still work as normal RESTe methods, but also give you collections and model support for (C)reate, (R)ead, (U)pdate, (D)elete. For Collections I use an array of collections so you can have multiple endpoints configured if different collections using the same model. This enables use of for example, Collections.locations (for all locations) and Collections.locationsByName (for locations by a specific parameter).
 
 (Ideally this should be more elegant, allowing the single locations collection in this case to be used to filter content but I needed a way to make this API independant and it's the best I can do for now!)
 
@@ -489,7 +489,7 @@ Using the following config you can configure end points that will still work as 
 In the example above, I can refresh the data for a collection by using:
 
 ```javascript
-Alloy.Collections.locations.fetch();
+Collections.locations.fetch();
 ```
 
 and bind it to a tableview as follows:
@@ -506,7 +506,7 @@ and bind it to a tableview as follows:
 You could also send parameters like follows:
 
 ```javascript
-Alloy.Collections.locationsByName.fetch({
+Collections.locationsByName.fetch({
 					name: "home"
 					});
 ```
@@ -516,13 +516,13 @@ To sort a collection, you need to set the comparator to the collection. Don't do
 Calling the sort function at any time after the fetch will try to sort.
 
 ```js
-Alloy.Collections.locations.comparator = function(a, b){
+Collections.locations.comparator = function(a, b){
 	// do your sorting here, a & b will be models
 };
 
-Alloy.Collections.locations.fetch({
+Collections.locations.fetch({
 	success: function(a,b,c){
-		Alloy.Collections.locations.sort();
+		Collections.locations.sort();
 	}
 });
 ```
@@ -535,14 +535,14 @@ RESTe provides a couple of useful helper functions to create new models and coll
 .createModel(name, attributes)
 .createCollection(name, array)
 ```
-Each return either a model, or collection that can then be used with Alloy.
+Each return either a model, or collection that can then be used with Backbone.
 
 When working with created models, you can define an instance of a model that you've specified in the config, and if that supports CRUD functions, you can pass options when creating, saving, updating and deleting.
 
 So for example:
 
 ```javascript
-var user = Alloy.Globals.reste.createModel("user");
+var user = reste.createModel("user");
 
 user.save({
             username: $.email.value,
@@ -559,6 +559,144 @@ user.save({
                 console.log("Error saving user!");
                 console.log(response);
             }
+});
+```
+
+## Using RESTe with React Native and React
+
+RESTe can also be used with React Native and React. Here are some instructions on how to set it up:
+
+### React Native
+
+1. Install RESTe using npm:
+
+```sh
+npm install reste
+```
+
+2. Import RESTe in your React Native project:
+
+```javascript
+import reste from 'reste';
+```
+
+3. Configure RESTe in your project:
+
+```javascript
+const api = new reste();
+
+api.config({
+    debug: true,
+    errorsAsObjects: true,
+    autoValidateParams: false,
+    validatesSecureCertificate: false,
+    timeout: 4000,
+    url: "https://api.parse.com/1/",
+    requestHeaders: {
+        "X-Parse-Application-Id": "APPID",
+        "X-Parse-REST-API-Key": "RESTID",
+        "Content-Type": "application/json"
+    },
+    methods: [{
+        name: "courses",
+        post: "functions/getCourses",
+        onError: function(e, callback, globalOnError){
+            alert("There was an error getting the courses!");
+        }
+    }, {
+        name: "getVideos",
+        get: "classes/videos"
+    }, {
+        name: "getVideoById",
+        get: "classes/videos/<videoId>"
+    }, {
+        name: "addVideo",
+        post: "classes/videos"
+    }],
+    onError: function(e, retry) {
+        alert("There was an error connecting to the server, check your network connection and retry.");
+        retry();
+    },
+    onLoad: function(e, callback) {
+        callback(e);
+    }
+});
+```
+
+4. Use the configured methods in your React Native components:
+
+```javascript
+api.getVideos().then(videos => {
+    // do stuff with the videos
+}).catch(error => {
+    console.error(error);
+});
+```
+
+### React
+
+1. Install RESTe using npm:
+
+```sh
+npm install reste
+```
+
+2. Import RESTe in your React project:
+
+```javascript
+import reste from 'reste';
+```
+
+3. Configure RESTe in your project:
+
+```javascript
+const api = new reste();
+
+api.config({
+    debug: true,
+    errorsAsObjects: true,
+    autoValidateParams: false,
+    validatesSecureCertificate: false,
+    timeout: 4000,
+    url: "https://api.parse.com/1/",
+    requestHeaders: {
+        "X-Parse-Application-Id": "APPID",
+        "X-Parse-REST-API-Key": "RESTID",
+        "Content-Type": "application/json"
+    },
+    methods: [{
+        name: "courses",
+        post: "functions/getCourses",
+        onError: function(e, callback, globalOnError){
+            alert("There was an error getting the courses!");
+        }
+    }, {
+        name: "getVideos",
+        get: "classes/videos"
+    }, {
+        name: "getVideoById",
+        get: "classes/videos/<videoId>"
+    }, {
+        name: "addVideo",
+        post: "classes/videos"
+    }],
+    onError: function(e, retry) {
+        alert("There was an error connecting to the server, check your network connection and retry.");
+        retry();
+    },
+    onLoad: function(e, callback) {
+        callback(e);
+    }
+});
+```
+
+4. Use the configured methods in your React components:
+
+```javascript
+api.getVideos().then(videos => {
+    // do stuff with the videos
+}).catch(error => {
+    console.error(error);
 });
 ```
 

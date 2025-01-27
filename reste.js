@@ -377,15 +377,15 @@ function main() {
   };
 
   reste.createCollection = function (name, content) {
-    if (!Alloy.Collections[name]) {
-      Alloy.Collections[name] = new Backbone.Collection();
+    if (!reste.Collections[name]) {
+      reste.Collections[name] = new Backbone.Collection();
     }
 
     if (content instanceof Array) {
-      Alloy.Collections[name].reset(content);
+      reste.Collections[name].reset(content);
 
-      Alloy.Collections[name].fetch = function () {
-        Alloy.Collections[name].trigger('change');
+      reste.Collections[name].fetch = function () {
+        reste.Collections[name].trigger('change');
       };
     } else {
       throw 'No Array specified for createCollection';
@@ -415,10 +415,10 @@ function main() {
 
       if (args.collections) {
         args.collections.forEach((collection) => {
-          Alloy.Collections[collection.name] = Alloy.Collections[collection.name] || new Backbone.Collection();
-          Alloy.Collections[collection.name]._type = args.name;
-          Alloy.Collections[collection.name]._name = collection.name;
-          Alloy.Collections[collection.name].model = model;
+          reste.Collections[collection.name] = reste.Collections[collection.name] || new Backbone.Collection();
+          reste.Collections[collection.name]._type = args.name;
+          reste.Collections[collection.name]._name = collection.name;
+          reste.Collections[collection.name].model = model;
         });
       }
     };
@@ -447,7 +447,7 @@ function main() {
 
               if (options.success) options.success(response[collectionConfig.content]);
 
-              Alloy.Collections[collectionConfig.name].trigger('sync');
+              reste.Collections[collectionConfig.name].trigger('sync');
             } else {
               response.forEach((item) => {
                 item.id = item[modelConfig.id];
@@ -455,7 +455,7 @@ function main() {
 
               if (options.success) options.success(response);
 
-              Alloy.Collections[collectionConfig.name].trigger('sync');
+              reste.Collections[collectionConfig.name].trigger('sync');
             }
           }
         }, (response) => {
